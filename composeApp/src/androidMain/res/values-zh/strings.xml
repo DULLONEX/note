@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Note</string>
+    <string name="permission_denied_title">权限拒绝</string>
+    <string name="permission_denied_message">您已拒绝了权限请求。请前往应用设置中手动授予权限。</string>
+    <string name="go_to_settings">前往设置</string>
+    <string name="cancel">取消</string>
+</resources>

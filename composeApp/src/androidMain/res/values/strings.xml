@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Note</string>
+    <string name="permission_denied_title">Permission Denied</string>
+    <string name="permission_denied_message">You have denied the permission request. Please go to the app settings to grant the permission manually.</string>
+    <string name="go_to_settings">Go to Settings</string>
+    <string name="cancel">Cancel</string>
+</resources>

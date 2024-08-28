@@ -1,0 +1,120 @@
+
+import kotlin.Boolean;
+
+-- 提醒
+CREATE TABLE Remind(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tagId TEXT NOT NULL, -- 用于标记系统中的id对应
+    title TEXT NOT NULL,
+    details TEXT NOT NULL,
+    startDate INTEGER NOT NULL,
+    endDate INTEGER NOT NULL,
+    alarm INTEGER AS Boolean DEFAULT 0,
+    beforeMinutes INTEGER NOT NULL,
+    proceedStatus INTEGER DEFAULT 0 NOT NULL, -- 进行状态
+    whetherDelete INTEGER AS Boolean DEFAULT 0 NOT NULL
+);
+
+selectRemindsAfterStartDate:
+SELECT * FROM Remind WHERE startDate>= ?;
+
+insertRemind:
+INSERT INTO Remind (
+    tagId,
+    title,
+    details,
+    startDate,
+    endDate,
+    alarm,
+    beforeMinutes
+) VALUES (
+    ?, ?, ?, ?, ?, ?, ?
+);
+
+delRemind:
+UPDATE Remind SET
+    whetherDelete = 1
+WHERE id = ?;
+
+syncRemindStatus:
+UPDATE Remind
+SET proceedStatus = CASE
+    WHEN endDate < ? THEN 2
+    WHEN startDate < ? AND endDate > ? THEN 1
+    ELSE 0
+END
+WHERE whetherDelete = 0 AND proceedStatus != 2;
+
+updateRemind:
+UPDATE Remind SET
+    title = ?, details = ?, startDate = ?, endDate = ?, alarm = ?, beforeMinutes = ?
+WHERE id = ?;
+
+selectAllReminds:
+SELECT t1.*
+FROM Remind AS t1
+WHERE whetherDelete = 0
+ORDER BY
+    CASE
+        WHEN (strftime('%s', 'now') * 1000 - startDate) < 0 THEN 1
+        ELSE 0
+    END,
+    ABS(strftime('%s', 'now') * 1000 - startDate) DESC;
+
+
+selectRemindById:
+SELECT * FROM Remind WHERE id = ?;
+
+selectAllRemindsByStatus:
+SELECT * FROM Remind WHERE whetherDelete = 0 AND proceedStatus = ?;
+
+updateRemindStatus:
+UPDATE Remind SET
+    proceedStatus = ? , startDate = ? , endDate = ?
+WHERE id = ?;
+-- 金额
+CREATE TABLE AmountType(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    message TEXT  NOT NULL,
+    whetherSystem INTEGER AS Boolean DEFAULT 0 NOT NULL, -- 是否除非系统
+    whetherDelete INTEGER AS Boolean DEFAULT 0 NOT NULL
+);
+
+INSERT OR IGNORE INTO AmountType (id, message, whetherSystem, whetherDelete)
+VALUES
+    (1, 'shopping', 1, 0),
+    (2, 'dining', 1, 0),
+    (3, 'recreation', 1, 0),
+    (4, 'gaming', 1, 0);
+
+insertAmountType:
+INSERT INTO  AmountType (message)
+VALUES(?) ;
+
+updateAmountType:
+UPDATE AmountType SET message = ?
+WHERE id = ?;
+
+
+-- 账单
+CREATE TABLE ChargeUp(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    content TEXT NOT NULL ,
+    amount TEXT NOT NULL ,
+    files TEXT,
+    amountTypeId INTEGER NOT NULL,
+    createTime  INTEGER NOT NULL,
+    whetherDelete INTEGER AS Boolean DEFAULT 0 NOT NULL
+);
+
+insertChargeUp:
+INSERT INTO ChargeUp(content,amount,files,amountTypeId,createTime)
+VALUES (?,?,?,?,?);
+
+updateChargeUp:
+UPDATE ChargeUp SET content = ?,amount = ?,files = ?,amountTypeId = ? WHERE id = ?;
+
+delChargeUp:
+DELETE FROM ChargeUp WHERE id = ?;
+
+

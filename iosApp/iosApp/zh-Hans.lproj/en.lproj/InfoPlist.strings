@@ -1,0 +1,8 @@
+/* 
+  InfoPlist.strings
+  iosApp
+
+  Created by 步华镇 on 2024/7/26.
+  Copyright © 2024 orgName. All rights reserved.
+*/
+"NSCalendarsUsageDescription" = "我们需要访问您的日历来添加事件。";

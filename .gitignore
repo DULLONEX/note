@@ -1,5 +1,7 @@
 HELP.md
 target/
+iosApp/iosApp.xcodeproj/
+iosApp/iosApp.xcodeproj/project.xcworkspace/xcuserdata/buhuazhen.xcuserdatad/UserInterfaceState.xcuserstate
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -7,6 +9,7 @@ target/
 .gradle/
 build/
 composeApp/build/
+shared/
 ### STS ###
 .apt_generated
 .classpath
@@ -28,7 +31,6 @@ composeApp/build/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 

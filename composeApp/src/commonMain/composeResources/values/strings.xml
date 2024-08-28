@@ -1,0 +1,25 @@
+<resources>
+    <string name="remind">Remind</string>
+    <string name="charge_up">Charge_up</string>
+    <string name="add_remind_info">Add remind information</string>
+    <string name="add_charge_up_info">Add chargeUp information</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_title">Add title</string>
+    <string name="add_details">Add details</string>
+    <string name="whether_to_remind">Remind in advance</string>
+    <string name="minutes_before">minutes before</string>
+    <string name="confirm">Confirm</string>
+    <string name="error_time1">The start time must be no later than the end time.</string>
+    <string name="close">Close</string>
+    <string name="not_state">not state</string>
+    <string name="ongoing">ongoing</string>
+    <string name="done">done</string>
+    <string name="remark">Remark</string>
+    <string name="shopping">Shopping</string>
+    <string name="dining">Dining</string>
+    <string name="recreation">Recreation</string>
+    <string name="gaming">Gaming</string>
+    <string name="add_image">Add image</string>
+
+</resources>
