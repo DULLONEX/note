@@ -62,7 +62,7 @@ import org.jetbrains.compose.resources.stringResource
 import ui.MyNewIndicator
 import ui.NoRippleInteractionSource
 import ui.viewmodel.RemindViewModel
-import ui.viewmodel.ShowRemind
+import data.entiry.ShowRemind
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

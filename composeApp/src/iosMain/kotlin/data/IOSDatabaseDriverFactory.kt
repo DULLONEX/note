@@ -7,7 +7,7 @@ import com.onex.AppDatabase
 
 class IOSDatabaseDriverFactory : DatabaseDriverFactory {
     override fun createDriver(): SqlDriver {
-         deleteDatabase("note.db")
+         //deleteDatabase("note.db")
         return NativeSqliteDriver(AppDatabase.Schema, "note.db")
     }
 }

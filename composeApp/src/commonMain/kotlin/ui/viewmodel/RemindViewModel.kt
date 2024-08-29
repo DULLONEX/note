@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import config.RemindStatus
 import config.Timer
 import config.getCurrentDateTimeLong
+import data.entiry.ShowRemind
 import data.service.RemindService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -82,12 +83,3 @@ class RemindViewModel : ViewModel(), KoinComponent {
     }
 
 }
-
-data class ShowRemind(
-    val id: Long = 0,
-    val event: String = "",
-    val title: String = "",
-    val time: String = "",
-    val details: String = "",
-    val status: RemindStatus = RemindStatus.ONGOING
-)

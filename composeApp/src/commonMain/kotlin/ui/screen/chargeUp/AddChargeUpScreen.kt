@@ -88,6 +88,7 @@ class AddChargeUpCompose : KoinComponent {
     ) {
         val fileList = remember { mutableStateListOf<FileData?>(null) }
 
+        val chargeUpStatus by viewModel.chargeUpStatus.collectAsState()
         val amountTypeList by viewModel.amountTypeList.collectAsState()
 
         val navCompose = NavCompose()
@@ -108,7 +109,9 @@ class AddChargeUpCompose : KoinComponent {
                     Modifier.padding(horizontal = 8.dp),
                     amountTypeList = amountTypeList,
                     addAmountType = viewModel::saveAmountType,
-                    updateAmountType = viewModel::updateAmountType
+                    updateAmountType = viewModel::updateAmountType,
+                    selected = chargeUpStatus.amountType,
+                    selectOnChange = viewModel::amountTypeSelect
                 )
                 //选择图片
                 platform.SelectImageCompose(fileDataList = fileList,
@@ -176,33 +179,39 @@ fun AmountTypeCompose(
     amountTypeList: List<AmountTypeDto> = emptyList(),
     addAmountType: (String) -> Unit = {},
     updateAmountType: (Long, String) -> Unit = { _, _ -> },
+    selected: AmountTypeDto = AmountTypeDto(0, "", false),
+    selectOnChange: (AmountTypeDto) -> Unit = {}
 ) {
     var showSheet by remember { mutableStateOf(false) }
 
-    var selectedType by remember { mutableStateOf(AmountTypeDto(0, "", false)) }
+    //  var selectedType by remember { mutableStateOf(selected) }
 
     LazyVerticalGrid(
         modifier = modifier,
         columns = GridCells.Adaptive(75.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(amountTypeList,key = {it.message}) {item->
+        items(amountTypeList, key = { it.message }) { item ->
 
-            AmountTypeItem(amountTypeDto = item, onClick = {
-                selectedType = item
-            }, selectedNum = selectedType.id.toInt(), textModifier = Modifier.heightIn(max = 50.dp) .pointerInput(Unit) {
-                detectTapGestures(onTap = {
-                    // 普通点击事件
-                    selectedType = item
-                }, onLongPress = {
-                    // 长按事件
-                    // val currentType = amountTypeList.findLast { it.id == item.id }!!
-                    if (!item.whetherSystem) {
-                        selectedType = item
-                        showSheet = !showSheet
-                    }
+            AmountTypeItem(
+                amountTypeDto = item,
+                onClick = {
+                    selectOnChange(item)
+                },
+                selectedId = selected.id,
+                textModifier = Modifier.heightIn(max = 50.dp).pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        // 普通点击事件
+                        selectOnChange(item)
+                    }, onLongPress = {
+                        // 长按事件
+                        // val currentType = amountTypeList.findLast { it.id == item.id }!!
+                        if (!item.whetherSystem) {
+                            selectOnChange(item)
+                            showSheet = !showSheet
+                        }
+                    })
                 })
-            })
 
         }
         item {
@@ -217,7 +226,7 @@ fun AmountTypeCompose(
     if (showSheet) {
         AmountTypeBottomSheet(Modifier, onDone = {
             updateAmountType(it.id, it.message)
-        }, onDismiss = { showSheet = !showSheet }, amountType = selectedType)
+        }, onDismiss = { showSheet = !showSheet }, amountType = selected)
     }
 }
 
@@ -285,7 +294,7 @@ fun AmountTypeItem(
     textModifier: Modifier = Modifier,
     amountTypeDto: AmountTypeDto,
     onClick: () -> Unit,
-    selectedNum: Int
+    selectedId: Long
 ) {
     FilterChip(
         modifier = filterChipModifier, onClick = onClick, label = {
@@ -297,7 +306,7 @@ fun AmountTypeItem(
                 )
             }
 
-        }, selected = amountTypeDto.id.toInt() == selectedNum
+        }, selected = amountTypeDto.id == selectedId
     )
 
 }
@@ -358,15 +367,16 @@ fun AmountInputCompose(
 
     ) {
     val outline = MaterialTheme.colorScheme.outline
-    OutlinedTextField(modifier = modifier.drawWithContent {
-        drawContent()
-        drawLine(
-            color = outline,
-            start = Offset(x = 0f, y = size.height),
-            end = Offset(x = size.width, y = size.height),
-            strokeWidth = 2f
-        )
-    },
+    OutlinedTextField(
+        modifier = modifier.drawWithContent {
+            drawContent()
+            drawLine(
+                color = outline,
+                start = Offset(x = 0f, y = size.height),
+                end = Offset(x = size.width, y = size.height),
+                strokeWidth = 2f
+            )
+        },
         value = value,
         onValueChange = onChange,
         placeholder = {
