@@ -19,7 +19,11 @@ class RemindViewModel : ViewModel(), KoinComponent {
 
     val showRemind: MutableStateFlow<Map<RemindStatus, List<ShowRemind>>> =
         MutableStateFlow(hashMapOf())
-
+    init {
+        viewModelScope.launch {
+            loadRemindList()
+        }
+    }
 
     suspend fun refresh() {
         val timer = Timer()
@@ -32,7 +36,7 @@ class RemindViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    suspend fun loadRemindList() {
+    private suspend fun loadRemindList() {
         val language = platform.getCurrentLanguage()
         viewModelScope.launch {
             remindService.findRemindAll(language).collect{

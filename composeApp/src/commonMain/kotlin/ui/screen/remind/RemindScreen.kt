@@ -83,9 +83,6 @@ fun RemindScreen(
     }, initialPage = RemindStatus.ONGOING.value.toInt())
 
     val showRemind by viewModel.showRemind.collectAsState()
-    coroutineScope.launch {
-        viewModel.loadRemindList()
-    }
 
     val navCompose = NavCompose()
     Scaffold(modifier = modifier, floatingActionButton = {
@@ -260,7 +257,7 @@ fun RemindHorizontalPager(
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
                 if (currentPageReminds != null) {
-                    items(currentPageReminds) { item ->
+                    items(currentPageReminds, key = {it.id}) { item ->
                         RemindItem(
                             Modifier.combinedClickable(onClick = {
                                 onClick(item.id)

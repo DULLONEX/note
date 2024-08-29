@@ -1,0 +1,23 @@
+import kotlin.Boolean;
+
+-- 账单
+CREATE TABLE ChargeUp(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    content TEXT NOT NULL ,
+    amount TEXT NOT NULL ,
+    files TEXT,
+    amountTypeId INTEGER NOT NULL,
+    createTime  INTEGER NOT NULL,
+    whetherDelete INTEGER AS Boolean DEFAULT 0 NOT NULL
+);
+
+insertChargeUp:
+INSERT INTO ChargeUp(content,amount,files,amountTypeId,createTime)
+VALUES (?,?,?,?,?);
+
+updateChargeUp:
+UPDATE ChargeUp SET content = ?,amount = ?,files = ?,amountTypeId = ? WHERE id = ?;
+
+delChargeUp:
+DELETE FROM ChargeUp WHERE id = ?;
+

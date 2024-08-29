@@ -122,10 +122,12 @@ dependencies {
 }
 
 sqldelight {
+
     databases {
         //sqldelight/com/onex/spacetutorial/cache
         create("AppDatabase") {
-            packageName.set("com.onex.spacetutorial.cache")
+            packageName.set("com.onex")
         }
+
     }
 }

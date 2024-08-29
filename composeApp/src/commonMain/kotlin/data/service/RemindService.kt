@@ -4,7 +4,7 @@ import Platform
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
-import com.onex.spacetutorial.cache.Remind
+import com.onex.note.Remind
 import config.RemindStatus
 import config.formatSimple
 import config.getCurrentDateTime
@@ -53,7 +53,7 @@ class RemindServiceImpl : RemindService, KoinComponent {
 
     override fun saveRemind(remind: RemindDto) {
         val eventId = platform.addCalendarEvent(remind)
-        database.dbQuery.insertRemind(eventId, remind)
+        database.remindQueries.insertRemind(eventId, remind)
     }
 
     override suspend fun initialLoad() = runBlocking(context = Dispatchers.IO) {
@@ -68,34 +68,34 @@ class RemindServiceImpl : RemindService, KoinComponent {
         val systemCalendarEvents = async { platform.queryCalendarEvents() }
 
         val dbEvent = async {
-            database.dbQuery.selectRemindsAfterStartDate(getTodayZero().toLong()).executeAsList()
+            database.remindQueries.selectRemindsAfterStartDate(getTodayZero().toLong()).executeAsList()
         }
         val queryCalendarEvents = systemCalendarEvents.await()
         val dbRemindArray = dbEvent.await()
         val eventIdSet = queryCalendarEvents.map { it.eventId }.toSet()
         val tagMap = dbRemindArray.associateBy { it.tagId }
 
-        database.dbQuery.transaction {
+        database.remindQueries.transaction {
             queryCalendarEvents.forEach {
                 if (tagMap[it.eventId] == null) {
                     // add
-                    database.dbQuery.insertRemind(it.eventId, it.remindDto)
+                    database.remindQueries.insertRemind(it.eventId, it.remindDto)
                 } else {
                     // update
                     // database.dbQuery.updateRemind(tagMap[it.eventId]!!.id, it.remindDto)
                 }
             }
         }
-        database.dbQuery.transaction {
+        database.remindQueries.transaction {
             dbRemindArray.filter { remind ->
                 remind.tagId !in eventIdSet
             }.forEach {
-                database.dbQuery.delRemind(it.id)
+                database.remindQueries.delRemind(it.id)
             }
         }
         // 4.状态进行修正
-        database.dbQuery.transaction {
-            database.dbQuery.syncRemindStatus()
+        database.remindQueries.transaction {
+            database.remindQueries.syncRemindStatus()
         }
 
         println("initialLoad ok ${getCurrentDateTime()}")
@@ -103,7 +103,7 @@ class RemindServiceImpl : RemindService, KoinComponent {
 
     override suspend fun findRemindAll(language: String): Flow<Map<RemindStatus, List<ShowRemind>>> {
         val map =
-            database.dbQuery.selectAllReminds().asFlow().mapToList(Dispatchers.IO).map { array ->
+            database.remindQueries.selectAllReminds().asFlow().mapToList(Dispatchers.IO).map { array ->
                 // time 处理
                 array.map { remind ->
                     ShowRemind(
@@ -129,19 +129,19 @@ class RemindServiceImpl : RemindService, KoinComponent {
     override suspend fun updateRemindStatus(
         id: Long, status: RemindStatus, start: Long, end: Long
     ) {
-        database.dbQuery.updateRemindStatus(status.value, start, end, id)
+        database.remindQueries.updateRemindStatus(status.value, start, end, id)
     }
 
     override suspend fun updateRemind(id: Long, remind: RemindDto) {
-        database.dbQuery.updateRemind(id, remind)
+        database.remindQueries.updateRemind(id, remind)
     }
 
     override suspend fun delRemindById(id: Long) {
-        database.dbQuery.delRemind(id)
+        database.remindQueries.delRemind(id)
     }
 
     override suspend fun findRemindById(id: Long): Remind {
-        return database.dbQuery.selectRemindById(id).executeAsOne()
+        return database.remindQueries.selectRemindById(id).executeAsOne()
     }
 
 

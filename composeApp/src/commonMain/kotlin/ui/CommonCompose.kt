@@ -51,7 +51,9 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -223,7 +225,7 @@ fun NumberPicker(
                 )
             }
         }
-        items(numbers.toList()) { value ->
+        items(numbers.toList(), key = {it}) { value ->
             Box(
                 modifier = Modifier.height(40.dp)  // Each item has a height of 40.dp
                     .fillMaxWidth(), contentAlignment = Alignment.Center
@@ -322,22 +324,33 @@ fun CenteredTextField(
 ) {
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val textFieldValue = remember { mutableStateOf(TextFieldValue(text)) }
+
+    LaunchedEffect(Unit) {
+        textFieldValue.value = textFieldValue.value.copy(
+            selection = TextRange(textFieldValue.value.text.length) // 光标始终在文本末尾
+        )
+
+        focusRequester.requestFocus() // 请求焦点
+        keyboardController?.show() // 显示软键盘
+    }
+    // todo 没有文字的时候光标不显示在中心
     Box(
         contentAlignment = Alignment.Center, modifier = modifier.fillMaxWidth() // 使Box填满父容器宽度
     ) {
         OutlinedTextField(
-            value = text,
-            onValueChange = onTextChange,
+            value = textFieldValue.value,
+            onValueChange = {
+                textFieldValue.value = it
+                onTextChange(it.text)
+            },
             modifier = Modifier.align(Alignment.Center) // 确保TextField居中对齐
                 .widthIn(min = 100.dp)  // 设置最小宽度，宽度可以随输入内容扩展
                 .padding(horizontal = 16.dp).focusRequester(focusRequester), // 给TextField一些水平内边距
             textStyle = TextStyle(textAlign = TextAlign.Center) // 文本居中对齐
         )
     }
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus() // 请求焦点
-        keyboardController?.show() // 显示软键盘
-    }
+
 }
 
 

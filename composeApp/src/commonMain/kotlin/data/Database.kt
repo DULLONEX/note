@@ -1,25 +1,26 @@
 package data
 
-import com.onex.spacetutorial.cache.AppDatabase
-import com.onex.spacetutorial.cache.AppDatabaseQueries
+import com.onex.AppDatabase
+import com.onex.note.RemindQueries
 import config.getCurrentDateTimeLong
 import config.toLong
 import data.entiry.RemindDto
 
 class Database(databaseDriverFactory: DatabaseDriverFactory) {
     private val database = AppDatabase(databaseDriverFactory.createDriver())
-    public val dbQuery = database.appDatabaseQueries
+    public val remindQueries = database.remindQueries
+    public val amountTypeQueries = database.amountTypeQueries
 }
 
-fun AppDatabaseQueries.insertRemind(eventId:String,remind: RemindDto){
+fun RemindQueries.insertRemind(eventId:String,remind: RemindDto){
     insertRemind(eventId,remind.title,remind.details,remind.startDate.toLong(),remind.endDate.toLong(),remind.alarm,remind.beforeMinutes.toLong())
 }
 
-fun AppDatabaseQueries.updateRemind(id:Long,remind: RemindDto){
+fun RemindQueries.updateRemind(id:Long,remind: RemindDto){
     updateRemind(remind.title,remind.details,remind.startDate.toLong(),remind.endDate.toLong(),remind.alarm,remind.beforeMinutes.toLong(),id)
 }
 
-fun AppDatabaseQueries.syncRemindStatus(){
+fun RemindQueries.syncRemindStatus(){
     syncRemindStatus(endDate = getCurrentDateTimeLong(), startDate = getCurrentDateTimeLong(), endDate_ = getCurrentDateTimeLong())
 
 }

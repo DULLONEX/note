@@ -7,6 +7,8 @@ import android.content.Context
 import androidx.navigation.NavHostController
 import data.Database
 import data.DatabaseDriverFactory
+import data.service.AmountTypeService
+import data.service.AmountTypeServiceImpl
 import data.service.RemindService
 import data.service.RemindServiceImpl
 import org.koin.android.ext.koin.androidContext
@@ -18,6 +20,7 @@ val appModule = module {
     single<Platform> { (controller: NavHostController,context:Context) -> AndroidPlatform(controller,context) }
     single<Database> {(databaseDriverFactory: DatabaseDriverFactory)-> Database(databaseDriverFactory) }
     single<RemindService> { RemindServiceImpl() }
+    single<AmountTypeService> { AmountTypeServiceImpl() }
 }
 
 

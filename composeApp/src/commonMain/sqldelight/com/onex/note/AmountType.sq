@@ -1,0 +1,27 @@
+import kotlin.Boolean;
+
+-- 金额
+CREATE TABLE AmountType(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    message TEXT  NOT NULL,
+    whetherSystem INTEGER AS Boolean DEFAULT 0 NOT NULL, -- 是否除非系统
+    whetherDelete INTEGER AS Boolean DEFAULT 0 NOT NULL
+);
+
+INSERT OR IGNORE INTO AmountType (id, message, whetherSystem, whetherDelete)
+VALUES
+    (1, 'shopping', 1, 0),
+    (2, 'dining', 1, 0),
+    (3, 'recreation', 1, 0),
+    (4, 'gaming', 1, 0);
+
+insertAmountType:
+INSERT INTO  AmountType (message)
+VALUES(?) ;
+
+updateAmountType:
+UPDATE AmountType SET message = :message
+WHERE id = :id;
+
+findAmountTypeAll:
+SELECT * FROM AmountType WHERE  whetherDelete = 0 ORDER BY id;

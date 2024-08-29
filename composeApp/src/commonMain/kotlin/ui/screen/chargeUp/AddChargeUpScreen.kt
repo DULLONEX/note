@@ -41,6 +41,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -64,6 +65,7 @@ import androidx.navigation.NavHostController
 import config.getStringResource
 import data.entiry.AmountTypeDto
 import data.entiry.FileData
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.add_image
@@ -93,6 +95,7 @@ class AddChargeUpCompose : KoinComponent {
     ) {
         val fileList = remember { mutableStateListOf<FileData?>(null) }
 
+        val amountTypeList by viewModel.amountTypeList.collectAsState()
 
         val navCompose = NavCompose()
         val scope = rememberCoroutineScope()
@@ -108,7 +111,12 @@ class AddChargeUpCompose : KoinComponent {
             ) {
                 HeadCompose()
                 //类型
-                AmountTypeCompose(Modifier.padding(horizontal = 8.dp))
+                AmountTypeCompose(
+                    Modifier.padding(horizontal = 8.dp),
+                    amountTypeList = amountTypeList,
+                    addAmountType = viewModel::saveAmountType,
+                    updateAmountType = viewModel::updateAmountType
+                )
                 //选择图片
                 platform.SelectImageCompose(fileDataList = fileList,
                     addFile = { fileList.add(FileData(null, it)) },
@@ -174,29 +182,30 @@ fun AmountTypeCompose(
     modifier: Modifier = Modifier,
     amountTypeList: List<AmountTypeDto> = emptyList(),
     addAmountType: (String) -> Unit = {},
-    updateAmountType: (String, String) -> Unit = { _, _ -> },
+    updateAmountType: (Long, String) -> Unit = { _, _ -> },
 ) {
     var showSheet by remember { mutableStateOf(false) }
-    var typeValue by remember { mutableStateOf("") }
 
-    var selectedNum by remember { mutableStateOf(-1) }
+    var selectedType by remember { mutableStateOf(AmountTypeDto(0, "", false)) }
+
     LazyVerticalGrid(
         modifier = modifier,
-        columns = GridCells.Fixed(5),
+        columns = GridCells.Adaptive(75.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(amountTypeList) {
-            val item = it
-            AmountTypeItem(amountTypeDto = it, onClick = {
-                selectedNum = it.id.toInt()
-            }, selectedNum = selectedNum, textModifier = Modifier.pointerInput(Unit) {
+        items(amountTypeList,key = {it.message}) {item->
+
+            AmountTypeItem(amountTypeDto = item, onClick = {
+                selectedType = item
+            }, selectedNum = selectedType.id.toInt(), textModifier = Modifier.heightIn(max = 50.dp) .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     // 普通点击事件
-                    selectedNum = item.id.toInt()
+                    selectedType = item
                 }, onLongPress = {
                     // 长按事件
+                    // val currentType = amountTypeList.findLast { it.id == item.id }!!
                     if (!item.whetherSystem) {
-                        typeValue = item.message
+                        selectedType = item
                         showSheet = !showSheet
                     }
                 })
@@ -211,11 +220,11 @@ fun AmountTypeCompose(
         }
     }
 
-    //显示修改以及删除
+    //显示修改以
     if (showSheet) {
         AmountTypeBottomSheet(Modifier, onDone = {
             updateAmountType(it.id, it.message)
-        }, onDismiss = { showSheet = !showSheet })
+        }, onDismiss = { showSheet = !showSheet }, amountType = selectedType)
     }
 }
 
@@ -239,8 +248,7 @@ fun AmountTypeAddItem(
     }, selected = false
     )
     if (showSheet) {
-        AmountTypeBottomSheet(
-            modifier = Modifier,
+        AmountTypeBottomSheet(modifier = Modifier,
             onDone = addAmountType,
             onDismiss = { showSheet = !showSheet })
     }
@@ -252,7 +260,7 @@ fun AmountTypeBottomSheet(
     modifier: Modifier = Modifier,
     onDone: (AmountTypeDto) -> Unit = {},
     onDismiss: () -> Unit = {},
-    amountType: AmountTypeDto = AmountTypeDto("", "", false)
+    amountType: AmountTypeDto = AmountTypeDto(0, "", false)
 ) {
     var text by remember { mutableStateOf(amountType.message) }
     ModalBottomSheet(modifier = modifier.heightIn(min = 300.dp), onDismissRequest = {
@@ -268,7 +276,6 @@ fun AmountTypeBottomSheet(
             )
             Spacer(Modifier.heightIn(40.dp))
             Button({
-
                 onDone(amountType.copy(message = text))
                 onDismiss()
             }) {
