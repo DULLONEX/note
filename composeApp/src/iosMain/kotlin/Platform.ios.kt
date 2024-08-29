@@ -34,15 +34,12 @@ import platform.EventKit.EKEventStore
 import platform.EventKit.EKSpan
 import platform.Foundation.NSCalendar
 import platform.Foundation.NSCalendarUnitWeekOfYear
-import platform.Foundation.NSCoder
-import platform.Foundation.NSComparator
 import platform.Foundation.NSDate
 import platform.Foundation.NSDateComponents
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSLocale
 import platform.Foundation.NSURL
 import platform.Foundation.NSUUID
-import platform.Foundation.NSUserDefaults
 import platform.Foundation.URLByAppendingPathComponent
 import platform.Foundation.currentLocale
 import platform.Foundation.languageCode

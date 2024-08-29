@@ -3,16 +3,13 @@ package ui.screen.chargeUp
 
 import NavCompose
 import Platform
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -52,20 +49,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import config.getStringResource
 import data.entiry.AmountTypeDto
 import data.entiry.FileData
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.add_image
@@ -81,7 +75,6 @@ import ui.PictureViewer
 import ui.TextInputCompose
 import ui.theme.TransparentOutlinedTextFieldColors
 import ui.viewmodel.SaveChargeUpViewModel
-import ui.viewmodel.SaveRemindViewModel
 
 class AddChargeUpCompose : KoinComponent {
 

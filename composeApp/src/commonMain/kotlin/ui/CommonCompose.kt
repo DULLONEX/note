@@ -66,9 +66,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.confirm
-import note.composeapp.generated.resources.demo
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ui.theme.TransparentOutlinedTextFieldColors
 import ui.theme.timeShadow
