@@ -8,7 +8,7 @@ import data.DatabaseDriverFactory
 
 class AndroidDatabaseDriverFactory(private val context: Context) : DatabaseDriverFactory {
     override fun createDriver(): SqlDriver {
-//         context.deleteDatabase("note.db")
+         //context.deleteDatabase("note.db")
         return AndroidSqliteDriver(AppDatabase.Schema, context, "note.db")
     }
 

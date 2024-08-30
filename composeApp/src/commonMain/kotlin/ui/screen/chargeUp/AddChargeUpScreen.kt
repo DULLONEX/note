@@ -36,8 +36,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,6 +62,8 @@ import androidx.navigation.NavHostController
 import config.getStringResource
 import data.entiry.AmountTypeDto
 import data.entiry.FileData
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.add_image
@@ -69,6 +74,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import ui.AlterSnackbar
 import ui.CenteredTextField
 import ui.PictureViewer
 import ui.TextInputCompose
@@ -85,18 +91,32 @@ class AddChargeUpCompose : KoinComponent {
         navController: NavHostController = platform.navController,
         viewModel: SaveChargeUpViewModel = viewModel { SaveChargeUpViewModel() },
     ) {
+       val scope= rememberCoroutineScope()
+        // snackBar 提示
+        val snackarHostState = remember { SnackbarHostState() }
+        val errorInfo by viewModel.errorInfo.collectAsState()
+        errorInfo?.let {
+           val stringResource =  stringResource(it)
+            scope.launch {
+                snackarHostState.showSnackbar(stringResource)
+            }
+        }
+
+
 
         val chargeUpStatus by viewModel.chargeUpStatus.collectAsState()
         val amountTypeList by viewModel.amountTypeList.collectAsState()
 
 
-
         val navCompose = NavCompose()
-        val scope = rememberCoroutineScope()
-        Scaffold(modifier, topBar = {
+        Scaffold(modifier,
+            snackbarHost = { SnackbarHost(hostState = snackarHostState){ AlterSnackbar(it) } },
+            topBar = {
             navCompose.TopAppBarCompose(Modifier.padding(end = 16.dp), onActionClick = {
                 scope.launch {
-                    navController.navigateUp()
+                    if (viewModel.save()) {
+                        navController.navigateUp()
+                    }
                 }
             })
         }) { innerPadding ->
@@ -120,7 +140,7 @@ class AddChargeUpCompose : KoinComponent {
                 //选择图片
                 platform.SelectImageCompose(fileDataList = chargeUpStatus.files,
                     addFile = { viewModel.addFile(FileData(null, it)) },
-                    delFile = { image ->  },
+                    delFile = { image -> viewModel.delFile(image) },
                     content = { imageBitmapArray, addPhoto, delImageChange ->
                         SelectedFileImageCompose(
                             Modifier.padding(horizontal = 8.dp),

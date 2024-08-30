@@ -21,5 +21,7 @@
     <string name="recreation">Recreation</string>
     <string name="gaming">Gaming</string>
     <string name="add_image">Add image</string>
-
+    <string name="error_no_content">Please enter content.</string>">
+    <string name="error_no_amount1">Please enter the amount.</string>">
+    <string name="error_no_amount2">Please select the type of consumption.</string>">
 </resources>

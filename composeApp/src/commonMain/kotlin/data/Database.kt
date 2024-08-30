@@ -8,8 +8,9 @@ import data.entiry.RemindDto
 
 class Database(databaseDriverFactory: DatabaseDriverFactory) {
     private val database = AppDatabase(databaseDriverFactory.createDriver())
-    public val remindQueries = database.remindQueries
-    public val amountTypeQueries = database.amountTypeQueries
+     val remindQueries = database.remindQueries
+     val amountTypeQueries = database.amountTypeQueries
+     val chargeUpQueries = database.chargeUpQueries
 }
 
 fun RemindQueries.insertRemind(eventId:String,remind: RemindDto){

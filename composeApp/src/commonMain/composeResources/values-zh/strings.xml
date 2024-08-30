@@ -21,5 +21,8 @@
     <string name="recreation">娱乐</string>
     <string name="gaming">游戏</string>
     <string name="add_image">添加图片</string>
+    <string name="error_no_content">请输入内容。</string>">
+    <string name="error_no_amount1">请输入金额。</string>">
+    <string name="error_no_amount2">请选择消费种类。</string>">
 
 </resources>

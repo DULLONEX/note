@@ -30,6 +30,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -370,6 +372,16 @@ fun PictureViewer(
             }
         }
     }
+}
+
+
+@Composable
+fun AlterSnackbar(data: SnackbarData){
+    Snackbar(
+        snackbarData = data,
+        containerColor = MaterialTheme.colorScheme.errorContainer, // 设置背景颜色为警告颜色
+        contentColor = MaterialTheme.colorScheme.error // 设置文字颜色为白色
+    )
 }
 
 
