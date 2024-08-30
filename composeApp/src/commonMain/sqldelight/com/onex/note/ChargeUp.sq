@@ -5,7 +5,7 @@ CREATE TABLE ChargeUp(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     content TEXT NOT NULL ,
     amount TEXT NOT NULL ,
-    files TEXT,
+    files TEXT, -- 会按照,进行分割
     amountTypeId INTEGER NOT NULL,
     createTime  INTEGER NOT NULL,
     whetherDelete INTEGER AS Boolean DEFAULT 0 NOT NULL

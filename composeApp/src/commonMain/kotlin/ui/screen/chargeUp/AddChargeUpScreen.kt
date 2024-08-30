@@ -40,7 +40,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -86,10 +85,11 @@ class AddChargeUpCompose : KoinComponent {
         navController: NavHostController = platform.navController,
         viewModel: SaveChargeUpViewModel = viewModel { SaveChargeUpViewModel() },
     ) {
-        val fileList = remember { mutableStateListOf<FileData?>(null) }
 
         val chargeUpStatus by viewModel.chargeUpStatus.collectAsState()
         val amountTypeList by viewModel.amountTypeList.collectAsState()
+
+
 
         val navCompose = NavCompose()
         val scope = rememberCoroutineScope()
@@ -103,7 +103,11 @@ class AddChargeUpCompose : KoinComponent {
             Column(
                 Modifier.fillMaxSize().padding(innerPadding)
             ) {
-                HeadCompose()
+                HeadCompose(modifier= Modifier,
+                    textValue = chargeUpStatus.content,
+                    textOnChange = viewModel::contentChange,
+                    amountValue = chargeUpStatus.amount,
+                    amountOnChange = viewModel::amountChange)
                 //类型
                 AmountTypeCompose(
                     Modifier.padding(horizontal = 8.dp),
@@ -114,9 +118,9 @@ class AddChargeUpCompose : KoinComponent {
                     selectOnChange = viewModel::amountTypeSelect
                 )
                 //选择图片
-                platform.SelectImageCompose(fileDataList = fileList,
-                    addFile = { fileList.add(FileData(null, it)) },
-                    delFile = { image -> fileList.remove(fileList.find { it?.imageBitmap == image }) },
+                platform.SelectImageCompose(fileDataList = chargeUpStatus.files,
+                    addFile = { viewModel.addFile(FileData(null, it)) },
+                    delFile = { image ->  },
                     content = { imageBitmapArray, addPhoto, delImageChange ->
                         SelectedFileImageCompose(
                             Modifier.padding(horizontal = 8.dp),

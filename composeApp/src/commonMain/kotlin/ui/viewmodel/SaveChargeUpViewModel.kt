@@ -2,8 +2,10 @@ package ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import config.isNumeric
 import data.entiry.AmountTypeDto
 import data.entiry.ChargeUpDto
+import data.entiry.FileData
 import data.service.AmountTypeService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -26,21 +28,49 @@ class SaveChargeUpViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun amountTypeSelect(amountTypeDto: AmountTypeDto){
+    fun addFile(fileData: FileData) {
+        viewModelScope.launch {
+            // 创建一个新的 List，并添加新的文件
+            val updatedFiles = chargeUpStatus.value.files.toMutableList().apply {
+                add(fileData)
+            }
+            // 复制新的 List 并更新状态
+            chargeUpStatus.emit(chargeUpStatus.value.copy(files = updatedFiles))
+        }
+    }
+
+    fun contentChange(value: String) {
+        viewModelScope.launch {
+            chargeUpStatus.emit(chargeUpStatus.value.copy(content = value))
+        }
+    }
+
+    fun amountChange(value: String) {
+        // 判断是否全是数据
+        if (isNumeric(value) || value.isEmpty()) {
+            viewModelScope.launch {
+                chargeUpStatus.emit(chargeUpStatus.value.copy(amount = value))
+            }
+        }
+
+    }
+
+
+    fun amountTypeSelect(amountTypeDto: AmountTypeDto) {
         viewModelScope.launch {
             chargeUpStatus.emit(chargeUpStatus.value.copy(amountType = amountTypeDto))
         }
     }
 
-    fun saveAmountType(message:String) {
+    fun saveAmountType(message: String) {
         viewModelScope.launch {
             amountService.saveAmountType(message)
         }
     }
 
-    fun updateAmountType(id:Long,message:String) {
+    fun updateAmountType(id: Long, message: String) {
         viewModelScope.launch {
-            amountService.updateAmountType(id,message)
+            amountService.updateAmountType(id, message)
         }
     }
 
