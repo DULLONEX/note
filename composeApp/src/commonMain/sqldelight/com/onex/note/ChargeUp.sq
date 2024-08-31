@@ -10,6 +10,9 @@ CREATE TABLE ChargeUp(
     createTime  INTEGER NOT NULL,
     whetherDelete INTEGER AS Boolean DEFAULT 0 NOT NULL
 );
+selectAllChargeUp:
+SELECT * FROM ChargeUp WHERE whetherDelete = 0 ORDER BY  createTime DESC;
+
 
 insertChargeUp:
 INSERT INTO ChargeUp(content,amount,files,amountTypeId,createTime)
