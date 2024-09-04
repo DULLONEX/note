@@ -3,6 +3,7 @@ package org.onex.note
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,14 +16,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -34,7 +35,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +54,62 @@ import kotlinx.coroutines.launch
 import ui.CenteredTextField
 import ui.screen.chargeUp.AddChargeUpCompose
 import ui.screen.chargeUp.AmountInputCompose
+import ui.screen.chargeUp.StickyHeaderCompose
+
+@Composable
+@Preview
+fun StickyHeaderComposePreview(){
+    StickyHeaderCompose(Modifier,"2024-9","1000")
+}
+
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+@Preview
+fun LazyColumPreview(){
+    val items = (1..1000).toList()
+
+    LazyColumn {
+        stickyHeader {
+            Text(
+                text = "Sticky Header 1",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Gray)
+                    .padding(8.dp),
+                color = Color.White
+            )
+        }
+
+        items(items.subList(0, 200)) { item ->
+            Text(
+                text = "Item $item",
+                modifier = Modifier.padding(8.dp).fillMaxWidth()
+            )
+        }
+
+        stickyHeader {
+            Text(
+                text = "Sticky Header 2",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.DarkGray)
+                    .padding(8.dp),
+                color = Color.White
+            )
+        }
+
+        items(items.subList(200, 400)) { item ->
+            Text(
+                text = "Item $item",
+                modifier = Modifier.padding(8.dp).fillMaxWidth()
+            )
+        }
+
+        // Add more sticky headers and items as needed
+    }
+}
+
 
 
 @Preview

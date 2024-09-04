@@ -55,6 +55,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import config.RemindStatus
 import config.Route
 import config.listTab
+import data.entiry.ShowRemind
 import kotlinx.coroutines.launch
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.add_remind_info
@@ -62,7 +63,6 @@ import org.jetbrains.compose.resources.stringResource
 import ui.MyNewIndicator
 import ui.NoRippleInteractionSource
 import ui.viewmodel.RemindViewModel
-import data.entiry.ShowRemind
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

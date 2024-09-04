@@ -12,6 +12,7 @@ import config.toLocalDateTime
 import config.toLong
 import data.Database
 import data.entiry.RemindDto
+import data.entiry.ShowRemind
 import data.insertRemind
 import data.syncRemindStatus
 import data.updateRemind
@@ -23,7 +24,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import data.entiry.ShowRemind
 
 interface RemindService {
     fun saveRemind(remind: RemindDto)

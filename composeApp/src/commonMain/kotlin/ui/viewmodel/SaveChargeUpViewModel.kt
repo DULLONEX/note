@@ -3,7 +3,6 @@ package ui.viewmodel
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import config.isNumeric
 import data.entiry.AmountTypeDto
 import data.entiry.ChargeUpDto
 import data.entiry.FileData
@@ -18,7 +17,6 @@ import note.composeapp.generated.resources.error_no_amount1
 import note.composeapp.generated.resources.error_no_amount2
 import note.composeapp.generated.resources.error_no_content
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.stringResource
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

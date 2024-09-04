@@ -10,6 +10,8 @@ iosApp/iosApp.xcodeproj/project.xcworkspace/xcuserdata/buhuazhen.xcuserdatad/Use
 build/
 composeApp/build/
 shared/
+.fleet/
+.kotlin/
 ### STS ###
 .apt_generated
 .classpath
