@@ -4,12 +4,13 @@ import com.onex.note.SelectAllChargeUp
 import config.formatDateString
 
 data class ChargeUpDto(
-
+    // id
+    val id:Long = 0L,
     // 内容
     val content: String = "",
 
     // 金额
-    val amount: String = "0",
+    val amount: String = "",
 
     // 金额类型
     val amountType: AmountTypeDto = AmountTypeDto(0, ""),
@@ -29,6 +30,7 @@ data class MonthSumCharge(
 
 fun SelectAllChargeUp.toChargeUpDto(): ChargeUpDto {
     return ChargeUpDto(
+        this.id,
         this.content,
         this.amount,
         AmountTypeDto(this.amountTypeId, this.message),

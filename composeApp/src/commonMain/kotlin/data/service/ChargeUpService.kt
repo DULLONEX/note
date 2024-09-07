@@ -20,6 +20,8 @@ interface ChargeUpService {
     fun saveChargeUp(chargeUpDto: ChargeUpDto)
 
     fun findAllChargeUp(): Flow<Map<MonthSumCharge, List<ChargeUpDto>>>
+
+    fun deleteChargeUp(id: Long)
 }
 
 class ChargeUpServiceImpl : ChargeUpService, KoinComponent {
@@ -55,5 +57,9 @@ class ChargeUpServiceImpl : ChargeUpService, KoinComponent {
                     MonthSumCharge(map.value.sumOf { it.amount.toDouble() }.toString(), map.key)
                 }
             }
+    }
+
+    override fun deleteChargeUp(id: Long) {
+        database.chargeUpQueries.delChargeUp(id)
     }
 }

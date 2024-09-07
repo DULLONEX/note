@@ -25,4 +25,10 @@ class ChargeUpViewModel : ViewModel(), KoinComponent {
             }
         }
     }
+
+    fun delById(id: Long) {
+        viewModelScope.launch {
+            charService.deleteChargeUp(id)
+        }
+    }
 }

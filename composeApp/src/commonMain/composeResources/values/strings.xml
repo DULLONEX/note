@@ -24,4 +24,7 @@
     <string name="error_no_content">Please enter content.</string>">
     <string name="error_no_amount1">Please enter the amount.</string>">
     <string name="error_no_amount2">Please select the type of consumption.</string>">
+    <string name="delete">delete</string>">
+    <string name="confirm_del">Confirm delete</string>
+
 </resources>

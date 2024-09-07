@@ -24,5 +24,7 @@
     <string name="error_no_content">请输入内容。</string>">
     <string name="error_no_amount1">请输入金额。</string>">
     <string name="error_no_amount2">请选择消费种类。</string>">
+    <string name="delete">删除</string>">
+    <string name="confirm_del">确认删除</string>
 
 </resources>

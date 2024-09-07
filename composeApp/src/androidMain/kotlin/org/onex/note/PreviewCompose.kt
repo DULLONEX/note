@@ -7,6 +7,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +25,7 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -42,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -58,15 +61,72 @@ import ui.screen.chargeUp.StickyHeaderCompose
 
 @Composable
 @Preview
-fun StickyHeaderComposePreview(){
-    StickyHeaderCompose(Modifier,"2024-9","1000")
+fun StickyHeaderComposePreview() {
+    StickyHeaderCompose(Modifier, "2024-9", "1000")
+}
+
+@Composable
+@Preview
+fun Alter(){
+    @Composable
+    fun DeleteConfirmationDialog(
+        showDialog: Boolean,
+        onConfirmDelete: () -> Unit,
+        onDismissRequest: () -> Unit
+    ) {
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = onDismissRequest,  // 点击对话框外面时关闭
+                title = {
+                    Text(text = "确认删除")
+                },
+                text = {
+                    Text(text = "你确定要删除这个项目吗？此操作无法撤销。")
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        onConfirmDelete()  // 点击确认按钮时执行删除操作
+                    }) {
+                        Text(text = "删除")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = onDismissRequest) {
+                        Text(text = "取消")
+                    }
+                }
+            )
+        }
+    }
+    DeleteConfirmationDialog(showDialog = true, onConfirmDelete = {}, onDismissRequest = {})
+}
+
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+@Preview
+fun DraggableDemo() {
+
+    BehindMotionSwipeDemo()
+
+
+
+
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+@Preview
+fun SwipeToDismissBoxPreview() {
+    DemoSwipeToDismiss()
 }
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 @Preview
-fun LazyColumPreview(){
+fun LazyColumPreview() {
     val items = (1..1000).toList()
 
     LazyColumn {
@@ -84,7 +144,9 @@ fun LazyColumPreview(){
         items(items.subList(0, 200)) { item ->
             Text(
                 text = "Item $item",
-                modifier = Modifier.padding(8.dp).fillMaxWidth()
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
             )
         }
 
@@ -102,14 +164,15 @@ fun LazyColumPreview(){
         items(items.subList(200, 400)) { item ->
             Text(
                 text = "Item $item",
-                modifier = Modifier.padding(8.dp).fillMaxWidth()
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
             )
         }
 
         // Add more sticky headers and items as needed
     }
 }
-
 
 
 @Preview
@@ -144,6 +207,7 @@ fun ImagePreview() {
         }
     ) { contentPadding ->
         // Screen content
+        Box(Modifier.padding(contentPadding)) {  }
     }
 
 }

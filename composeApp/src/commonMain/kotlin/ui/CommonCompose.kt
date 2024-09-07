@@ -8,31 +8,42 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.AnchoredDraggableState
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,6 +68,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -67,11 +79,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import note.composeapp.generated.resources.Res
+import note.composeapp.generated.resources.cancel
 import note.composeapp.generated.resources.confirm
+import note.composeapp.generated.resources.confirm_del
+import note.composeapp.generated.resources.delete
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import ui.theme.TransparentOutlinedTextFieldColors
 import ui.theme.timeShadow
+import kotlin.math.roundToInt
 
 /**
  * 用于水平显示的动画
@@ -225,7 +241,7 @@ fun NumberPicker(
                 )
             }
         }
-        items(numbers.toList(), key = {it}) { value ->
+        items(numbers.toList(), key = { it }) { value ->
             Box(
                 modifier = Modifier.height(40.dp)  // Each item has a height of 40.dp
                     .fillMaxWidth(), contentAlignment = Alignment.Center
@@ -339,12 +355,10 @@ fun CenteredTextField(
         contentAlignment = Alignment.Center, modifier = modifier.fillMaxWidth() // 使Box填满父容器宽度
     ) {
         OutlinedTextField(
-            value = textFieldValue.value,
-            onValueChange = {
+            value = textFieldValue.value, onValueChange = {
                 textFieldValue.value = it
                 onTextChange(it.text)
-            },
-            modifier = Modifier.align(Alignment.Center) // 确保TextField居中对齐
+            }, modifier = Modifier.align(Alignment.Center) // 确保TextField居中对齐
                 .widthIn(min = 100.dp)  // 设置最小宽度，宽度可以随输入内容扩展
                 .padding(horizontal = 16.dp).focusRequester(focusRequester), // 给TextField一些水平内边距
             textStyle = TextStyle(textAlign = TextAlign.Center) // 文本居中对齐
@@ -375,8 +389,116 @@ fun PictureViewer(
 }
 
 
+enum class DragAnchors {
+    Start, Center, End,
+}
+
 @Composable
-fun AlterSnackbar(data: SnackbarData){
+fun DelAction(modifier: Modifier) {
+    Box(
+        modifier = modifier, contentAlignment = Alignment.Center
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                modifier = Modifier.padding(top = 10.dp, bottom = 4.dp).padding(horizontal = 20.dp)
+                    .size(22.dp),
+                imageVector = Icons.Filled.Delete,
+                contentDescription = null,
+                tint = Color.White
+            )
+
+            Text(
+                text = stringResource(Res.string.delete),
+                color = Color.White,
+                fontSize = 12.sp,
+            )
+        }
+    }
+
+}
+
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun DraggableItem(
+    state: AnchoredDraggableState<DragAnchors>,
+    content: @Composable BoxScope.() -> Unit,
+    startAction: @Composable (BoxScope.() -> Unit)? = {},
+    endAction: @Composable (BoxScope.() -> Unit)? = {}
+) {
+
+    Box(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+
+        endAction?.let {
+            endAction()
+        }
+
+        startAction?.let {
+            startAction()
+        }
+        Box(
+            modifier = Modifier.fillMaxWidth().align(Alignment.CenterStart).offset {
+                IntOffset(
+                    x = state.requireOffset().roundToInt(),
+                    y = 0,
+                )
+            }.anchoredDraggable(state, Orientation.Horizontal, reverseDirection = false),
+            content = content
+        )
+    }
+}
+
+@Composable
+fun DeleteConfirmationDialog(
+    showDialog: Boolean, onConfirmDelete: () -> Unit, onDismissRequest: () -> Unit
+) {
+    if (showDialog) {
+        Dialog(
+            onDismissRequest, DialogProperties(
+                usePlatformDefaultWidth = false
+            )
+        ) {
+            Box(
+                modifier = Modifier.background(Color.Gray.copy(alpha = 0.5f)).fillMaxSize()
+                    .zIndex(10F), contentAlignment = Alignment.Center
+            ) {
+                AlertDialog(
+                    onDismissRequest = onDismissRequest,
+                    title = {
+                        Text(
+                            text = stringResource(Res.string.confirm_del),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            onConfirmDelete()
+                        }) {
+                            Text(text = stringResource(Res.string.delete))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = onDismissRequest) {
+                            Text(text = stringResource(Res.string.cancel))
+                        }
+                    },
+                    modifier = Modifier.padding(16.dp),  // 控制外部留白
+                    shape = RoundedCornerShape(16.dp),  // 圆角效果
+                )
+            }
+        }
+
+
+    }
+}
+
+@Composable
+fun AlterSnackbar(data: SnackbarData) {
     Snackbar(
         snackbarData = data,
         containerColor = MaterialTheme.colorScheme.errorContainer, // 设置背景颜色为警告颜色

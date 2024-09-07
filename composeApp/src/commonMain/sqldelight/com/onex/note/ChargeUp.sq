@@ -24,5 +24,6 @@ updateChargeUp:
 UPDATE ChargeUp SET content = ?,amount = ?,files = ?,amountTypeId = ? WHERE id = ?;
 
 delChargeUp:
-DELETE FROM ChargeUp WHERE id = ?;
+UPDATE ChargeUp SET whetherDelete = 1 WHERE id = ?;
+
 
