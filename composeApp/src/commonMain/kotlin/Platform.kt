@@ -27,6 +27,8 @@ interface Platform {
     )
 
     fun saveFileImage(imageBitmap: ImageBitmap):String
+
+    suspend fun downFileImage(filePath:String):ImageBitmap?
 }
 
 /**

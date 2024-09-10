@@ -32,8 +32,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import config.LabelIcon
 import config.Route
 import config.returnLabelIcon
@@ -49,7 +51,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import ui.screen.chargeUp.AddChargeUpCompose
-import ui.screen.chargeUp.ChargeUpScreen
+import ui.screen.chargeUp.ChargeUpCompose
 import ui.screen.remind.AddRemindScreenCompose
 import ui.screen.remind.RemindScreen
 import ui.theme.AppTheme
@@ -60,10 +62,9 @@ import ui.theme.AppTheme
 fun App() {
     AppTheme {
         val navCompose = NavCompose()
-        Scaffold(modifier = Modifier.fillMaxSize(),
-            bottomBar = {
-                navCompose.BottomNavigationBar()
-            }) { innerPadding ->
+        Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
+            navCompose.BottomNavigationBar()
+        }) { innerPadding ->
             navCompose.MainNav(innerPadding = innerPadding)
         }
     }
@@ -74,7 +75,6 @@ class NavCompose : KoinComponent {
     private val remindService: RemindService by inject()
 
     private val platform: Platform by inject()
-    private val navState = MutableStateFlow(Route.REMIND)
 
     @Composable
     fun MainNav(
@@ -82,6 +82,7 @@ class NavCompose : KoinComponent {
     ) {
         val addRemindScreenCompose = AddRemindScreenCompose()
         val addChargeUpCompose = AddChargeUpCompose()
+        val chargeUpCompose = ChargeUpCompose()
         var isActive by remember { mutableStateOf(true) }
 
         rememberCoroutineScope().launch {
@@ -97,24 +98,31 @@ class NavCompose : KoinComponent {
             }
         }
         NavHost(navController = navController,
-            startDestination = Route.REMIND.name,
+            startDestination = Route.REMIND.route,
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
                 .padding(innerPadding),
             enterTransition = { fadeIn(animationSpec = tween(0)) },
             exitTransition = { fadeOut(animationSpec = tween(0)) }) {
 
 
-            composable(route = Route.REMIND.name) {
+            composable(route = Route.REMIND.route) {
                 RemindScreen(modifier = Modifier.size(100.dp))
             }
-            composable(route = Route.CHARGE_UP.name) {
-                ChargeUpScreen(modifier = Modifier.size(100.dp))
+            composable(route = Route.CHARGE_UP.route) {
+                chargeUpCompose.ChargeUpScreen(modifier = Modifier.size(100.dp))
             }
-            composable(route = Route.REMIND_ADD.name) {
+            composable(route = Route.REMIND_ADD.route) {
                 addRemindScreenCompose.AddRemindScreen(modifier = Modifier.size(100.dp))
             }
-            composable(route = Route.CHARGE_UP_ADD.name) {
+            composable(route = Route.CHARGE_UP_ADD.route) {
                 addChargeUpCompose.AddChargeUpScreen(modifier = Modifier.size(100.dp))
+            }
+            composable(
+                route = "${Route.CHARGE_UP_DETAIL.route}/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val id: Long? = backStackEntry.arguments?.getLong("id")
+                addChargeUpCompose.AddChargeUpScreen(modifier = Modifier.size(100.dp), id = id)
             }
         }
     }
@@ -122,11 +130,11 @@ class NavCompose : KoinComponent {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun TopAppBarCompose(
-        modifier: Modifier = Modifier, navController: NavHostController = platform.navController,
+        modifier: Modifier = Modifier,
+        navController: NavHostController = platform.navController,
         onActionClick: () -> Unit = {}
     ) {
-        TopAppBar(modifier = modifier, title = {
-        }, navigationIcon = {
+        TopAppBar(modifier = modifier, title = {}, navigationIcon = {
             IconButton(onClick = {
                 navController.navigateUp()
             }) {
@@ -143,19 +151,20 @@ class NavCompose : KoinComponent {
 
     @Composable
     fun FloatingAction(
-        modifier: Modifier = Modifier, navController: NavHostController = platform.navController,
-        description: String, toRoute: Route = Route.REMIND
+        modifier: Modifier = Modifier,
+        navController: NavHostController = platform.navController,
+        description: String,
+        toRoute: Route = Route.REMIND
     ) {
         FloatingActionButtonCompose(modifier, description) {
-            navController.navigate(toRoute.name)
+            navController.navigate(toRoute.route)
         }
     }
 
 
     @Composable
     fun FloatingActionButtonCompose(
-        modifier: Modifier = Modifier, description: String,
-        onClick: () -> Unit
+        modifier: Modifier = Modifier, description: String, onClick: () -> Unit
     ) {
         FloatingActionButton(
             onClick = {
@@ -183,7 +192,6 @@ class NavCompose : KoinComponent {
         navController: NavHostController = platform.navController
     ) {
         var selectedItem by rememberSaveable { mutableIntStateOf(0) }
-        val coroutineScope = rememberCoroutineScope()
 
         NavigationBar(
             modifier = modifier, tonalElevation = 0.dp
@@ -195,7 +203,6 @@ class NavCompose : KoinComponent {
                 }, label = { Text(item.showText) }, selected = isSelected, onClick = {
                     selectedItem = index
                     navController.navigate(item.id)
-                    coroutineScope.launch { navState.emit(Route.valueOf(item.id)) }
                 })
             }
         }

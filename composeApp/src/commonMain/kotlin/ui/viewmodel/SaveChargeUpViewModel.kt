@@ -24,7 +24,7 @@ class SaveChargeUpViewModel : ViewModel(), KoinComponent {
     private val amountService: AmountTypeService by inject()
     private val chargeUpService: ChargeUpService by inject()
 
-    val chargeUpStatus = MutableStateFlow(ChargeUpDto())
+    val chargeUpStatus = MutableStateFlow(ChargeUpDto(null))
 
     val amountTypeList = MutableStateFlow<List<AmountTypeDto>>(emptyList())
     val errorInfo = MutableStateFlow<StringResource?>(null)
@@ -34,6 +34,12 @@ class SaveChargeUpViewModel : ViewModel(), KoinComponent {
             amountService.findAmountTypeAll().collect {
                 amountTypeList.emit(it)
             }
+        }
+    }
+
+    fun loadChargeUpById(id: Long) {
+        viewModelScope.launch {
+            chargeUpStatus.emit(chargeUpService.findChargeUpById(id))
         }
     }
 
@@ -61,9 +67,13 @@ class SaveChargeUpViewModel : ViewModel(), KoinComponent {
         val result = CompletableDeferred<Boolean>()
 
         viewModelScope.launch {
-           val errorString = checkAllInputInfo()
+            val errorString = checkAllInputInfo()
             if (errorString == null) {
-                chargeUpService.saveChargeUp(chargeUpStatus.value)
+                if (chargeUpStatus.value.id == null) {
+                    chargeUpService.saveChargeUp(chargeUpStatus.value)
+                } else {
+
+                }
                 result.complete(true)
             } else {
                 errorInfo.emit(errorString)

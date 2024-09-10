@@ -12,22 +12,45 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 data class LabelIcon(
-    val id: String,
-    val icon: Painter,
-    val showText: String
+    val id: String, val icon: Painter, val showText: String
 )
 
 // 用于设置一些标签
 @Composable
 fun returnLabelIcon(): List<LabelIcon> {
     return listOf(
-        LabelIcon(Route.REMIND.name, painterResource(Res.drawable.event_upcoming), stringResource(Res.string.remind)),
-        LabelIcon(Route.CHARGE_UP.name, painterResource(Res.drawable.request_quote), stringResource(Res.string.charge_up)),
+        LabelIcon(
+            Route.REMIND.route,
+            painterResource(Res.drawable.event_upcoming),
+            stringResource(Res.string.remind)
+        ),
+        LabelIcon(
+            Route.CHARGE_UP.route,
+            painterResource(Res.drawable.request_quote),
+            stringResource(Res.string.charge_up)
+        ),
     )
 }
 
-enum class Route(s: String) {
-    REMIND("remind"), CHARGE_UP("charge_up"),REMIND_ADD("remind_add"),CHARGE_UP_ADD("charge_up_add")
+sealed class Route(val route: String) {
+    data object REMIND : Route("remind")
+    data object CHARGE_UP : Route("charge_up")
+    data object REMIND_ADD : Route("remind_add")
+    data object CHARGE_UP_ADD : Route("charge_up_add")
+    data object CHARGE_UP_DETAIL : Route("charge_up_detail")
+
+    companion object {
+        fun fromRoute(route: String): Route {
+            return when (route) {
+                REMIND.route -> REMIND
+                CHARGE_UP.route -> CHARGE_UP
+                REMIND_ADD.route -> REMIND_ADD
+                CHARGE_UP_ADD.route -> CHARGE_UP_ADD
+                CHARGE_UP_DETAIL.route -> CHARGE_UP_DETAIL
+                else -> throw IllegalArgumentException("Unknown route: $route")
+            }
+        }
+    }
 }
 
 

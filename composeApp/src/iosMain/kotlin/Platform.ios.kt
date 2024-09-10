@@ -16,6 +16,9 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.get
 import kotlinx.cinterop.refTo
 import kotlinx.cinterop.reinterpret
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -34,6 +37,7 @@ import platform.EventKit.EKEventStore
 import platform.EventKit.EKSpan
 import platform.Foundation.NSCalendar
 import platform.Foundation.NSCalendarUnitWeekOfYear
+import platform.Foundation.NSData
 import platform.Foundation.NSDate
 import platform.Foundation.NSDateComponents
 import platform.Foundation.NSFileManager
@@ -42,6 +46,7 @@ import platform.Foundation.NSURL
 import platform.Foundation.NSUUID
 import platform.Foundation.URLByAppendingPathComponent
 import platform.Foundation.currentLocale
+import platform.Foundation.dataWithContentsOfFile
 import platform.Foundation.languageCode
 import platform.Foundation.timeIntervalSince1970
 import platform.Foundation.writeToURL
@@ -252,15 +257,31 @@ class iOSPlatform(private val vc: NavHostController) : Platform {
         imageData!!.writeToURL(fileURL!!, true)
         return fileURL.toString()
     }
+
+    @OptIn(ExperimentalForeignApi::class)
+    override suspend fun downFileImage(filePath: String): ImageBitmap? {
+        // ios模拟器中会刷新掉保存的图片
+        return withContext(Dispatchers.IO) {
+            // 使用 NSData 读取文件
+            val nsData = NSData.dataWithContentsOfFile(filePath.removePrefix("file://"))
+            // 如果读取成功，使用 UIImage 加载图片
+            val uiImage = nsData?.let { UIImage(it) } ?: return@withContext null
+            // 转换为 ImageBitmap
+            uiImage.let {
+                val imageData = UIImageJPEGRepresentation(it, 0.99)
+                val bytes = imageData?.bytes?.reinterpret<ByteVar>()
+                val length = imageData?.length?.toInt() ?: 0
+                ByteArray(length) { index -> bytes!![index] }
+            }.let {
+                Image.makeFromEncoded(it).toComposeImageBitmap()
+            }
+        }
+
+    }
 }
 
 actual fun isSameWeek(
-    year1: Int,
-    month1: Int,
-    day1: Int,
-    year2: Int,
-    month2: Int,
-    day2: Int
+    year1: Int, month1: Int, day1: Int, year2: Int, month2: Int, day2: Int
 ): Boolean {
     val calendar = NSCalendar.currentCalendar
     // 创建日期组件
@@ -282,10 +303,14 @@ actual fun isSameWeek(
     val currentDate = NSDate()
 
     // 判断日期1和当前日期是否在同一周
-    val isDate1SameWeekAsCurrent = calendar.isDate(date1, equalToDate = currentDate, toUnitGranularity = NSCalendarUnitWeekOfYear)
+    val isDate1SameWeekAsCurrent = calendar.isDate(
+        date1, equalToDate = currentDate, toUnitGranularity = NSCalendarUnitWeekOfYear
+    )
 
     // 判断日期2和当前日期是否在同一周
-    val isDate2SameWeekAsCurrent = calendar.isDate(date2, equalToDate = currentDate, toUnitGranularity = NSCalendarUnitWeekOfYear)
+    val isDate2SameWeekAsCurrent = calendar.isDate(
+        date2, equalToDate = currentDate, toUnitGranularity = NSCalendarUnitWeekOfYear
+    )
 
     return isDate1SameWeekAsCurrent && isDate2SameWeekAsCurrent
 }

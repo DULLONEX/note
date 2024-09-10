@@ -103,7 +103,7 @@ fun RemindScreen(
                 pagerState = pagerState,
                 showRemind,
                 viewModel::refresh,
-                onClick = { id ->
+                onClick = {
 
                 },
                 onLongClick = { id, status, title ->

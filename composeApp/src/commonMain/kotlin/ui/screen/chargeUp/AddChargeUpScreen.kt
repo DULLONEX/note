@@ -40,6 +40,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -87,70 +88,83 @@ class AddChargeUpCompose : KoinComponent {
         modifier: Modifier = Modifier,
         navController: NavHostController = platform.navController,
         viewModel: SaveChargeUpViewModel = viewModel { SaveChargeUpViewModel() },
+        id: Long? = null
     ) {
-       val scope= rememberCoroutineScope()
+        val scope = rememberCoroutineScope()
         // snackBar 提示
         val snackarHostState = remember { SnackbarHostState() }
         val errorInfo by viewModel.errorInfo.collectAsState()
         errorInfo?.let {
-           val stringResource =  stringResource(it)
+            val stringResource = stringResource(it)
             scope.launch {
                 snackarHostState.showSnackbar(stringResource)
             }
         }
-
-
-
-        val chargeUpStatus by viewModel.chargeUpStatus.collectAsState()
-        val amountTypeList by viewModel.amountTypeList.collectAsState()
-
+        LaunchedEffect(id) {
+            if (id != null) {
+                viewModel.loadChargeUpById(id)
+            }
+        }
 
         val navCompose = NavCompose()
         Scaffold(modifier,
-            snackbarHost = { SnackbarHost(hostState = snackarHostState){ AlterSnackbar(it) } },
+            snackbarHost = { SnackbarHost(hostState = snackarHostState) { AlterSnackbar(it) } },
             topBar = {
-            navCompose.TopAppBarCompose(Modifier.padding(end = 16.dp), onActionClick = {
-                scope.launch {
-                    if (viewModel.save()) {
-                        navController.navigateUp()
+                navCompose.TopAppBarCompose(Modifier.padding(end = 16.dp), onActionClick = {
+                    scope.launch {
+                        if (viewModel.save()) {
+                            navController.navigateUp()
+                        }
                     }
-                }
-            })
-        }) { innerPadding ->
-            Column(
-                Modifier.fillMaxSize().padding(innerPadding)
-            ) {
-                HeadCompose(modifier= Modifier,
-                    textValue = chargeUpStatus.content,
-                    textOnChange = viewModel::contentChange,
-                    amountValue = chargeUpStatus.amount,
-                    amountOnChange = viewModel::amountChange)
-                //类型
-                AmountTypeCompose(
-                    Modifier.padding(horizontal = 8.dp),
-                    amountTypeList = amountTypeList,
-                    addAmountType = viewModel::saveAmountType,
-                    updateAmountType = viewModel::updateAmountType,
-                    selected = chargeUpStatus.amountType,
-                    selectOnChange = viewModel::amountTypeSelect
-                )
-                //选择图片
-                platform.SelectImageCompose(fileDataList = chargeUpStatus.files,
-                    addFile = { viewModel.addFile(FileData(null, it)) },
-                    delFile = { image -> viewModel.delFile(image) },
-                    content = { imageBitmapArray, addPhoto, delImageChange ->
-                        SelectedFileImageCompose(
-                            Modifier.padding(horizontal = 8.dp),
-                            imageBitmapArray = imageBitmapArray,
-                            addPhoto = addPhoto,
-                            delImageChange = delImageChange
-                        )
-                    })
-            }
-
+                })
+            }) { innerPadding ->
+            ChargeUpCompose(Modifier.fillMaxSize().padding(innerPadding))
         }
-
     }
+
+
+    @Composable
+    fun ChargeUpCompose(
+        modifier: Modifier = Modifier,
+        viewModel: SaveChargeUpViewModel = viewModel { SaveChargeUpViewModel() },
+    ) {
+        val chargeUpStatus by viewModel.chargeUpStatus.collectAsState()
+        val amountTypeList by viewModel.amountTypeList.collectAsState()
+
+        Column(
+            modifier
+        ) {
+            HeadCompose(
+                modifier = Modifier,
+                textValue = chargeUpStatus.content,
+                textOnChange = viewModel::contentChange,
+                amountValue = chargeUpStatus.amount,
+                amountOnChange = viewModel::amountChange
+            )
+            //类型
+            AmountTypeCompose(
+                Modifier.padding(horizontal = 8.dp),
+                amountTypeList = amountTypeList,
+                addAmountType = viewModel::saveAmountType,
+                updateAmountType = viewModel::updateAmountType,
+                selected = chargeUpStatus.amountType,
+                selectOnChange = viewModel::amountTypeSelect
+            )
+            //选择图片
+            platform.SelectImageCompose(fileDataList = chargeUpStatus.files,
+                addFile = { viewModel.addFile(FileData(null, it)) },
+                delFile = { image -> viewModel.delFile(image) },
+                content = { imageBitmapArray, addPhoto, delImageChange ->
+                    SelectedFileImageCompose(
+                        Modifier.padding(horizontal = 8.dp),
+                        imageBitmapArray = imageBitmapArray,
+                        addPhoto = addPhoto,
+                        delImageChange = delImageChange
+                    )
+                })
+        }
+    }
+
 }
 
 
@@ -214,8 +228,7 @@ fun AmountTypeCompose(
     ) {
         items(amountTypeList, key = { it.message }) { item ->
 
-            AmountTypeItem(
-                amountTypeDto = item,
+            AmountTypeItem(amountTypeDto = item,
                 onClick = {
                     selectOnChange(item)
                 },
@@ -271,7 +284,8 @@ fun AmountTypeAddItem(
     }, selected = false
     )
     if (showSheet) {
-        AmountTypeBottomSheet(modifier = Modifier,
+        AmountTypeBottomSheet(
+            modifier = Modifier,
             onDone = addAmountType,
             onDismiss = { showSheet = !showSheet })
     }
@@ -388,16 +402,15 @@ fun AmountInputCompose(
 
     ) {
     val outline = MaterialTheme.colorScheme.outline
-    OutlinedTextField(
-        modifier = modifier.drawWithContent {
-            drawContent()
-            drawLine(
-                color = outline,
-                start = Offset(x = 0f, y = size.height),
-                end = Offset(x = size.width, y = size.height),
-                strokeWidth = 2f
-            )
-        },
+    OutlinedTextField(modifier = modifier.drawWithContent {
+        drawContent()
+        drawLine(
+            color = outline,
+            start = Offset(x = 0f, y = size.height),
+            end = Offset(x = size.width, y = size.height),
+            strokeWidth = 2f
+        )
+    },
         value = value,
         onValueChange = onChange,
         placeholder = {

@@ -1,6 +1,7 @@
 package ui.screen.chargeUp
 
 import NavCompose
+import Platform
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -40,6 +41,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import config.Route
 import config.getStringResource
 import data.entiry.ChargeUpDto
@@ -47,6 +49,8 @@ import data.entiry.MonthSumCharge
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.add_charge_up_info
 import org.jetbrains.compose.resources.stringResource
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import ui.DelAction
 import ui.DeleteConfirmationDialog
 import ui.DragAnchors
@@ -54,36 +58,45 @@ import ui.DraggableItem
 import ui.viewmodel.ChargeUpViewModel
 import kotlin.math.roundToInt
 
-@Composable
-fun ChargeUpScreen(
-    modifier: Modifier = Modifier,
-    viewModel: ChargeUpViewModel = viewModel { ChargeUpViewModel() },
+class ChargeUpCompose : KoinComponent {
+    private val platform: Platform by inject()
 
-    ) {
-    val navCompose = NavCompose()
-    val chargeUpMap by viewModel.chargeUpMap.collectAsState()
-    Scaffold(modifier, floatingActionButton = {
-        navCompose.FloatingAction(
-            toRoute = Route.CHARGE_UP_ADD,
-            description = stringResource(Res.string.add_charge_up_info)
-        )
-    }) {
-        /**
-         * 类似与常见的那种账单页面
-         * 根据时间排序
-         * 上面tap：年-月 总金额
-         * 下面一条条账单
-         */
-        ChargeUpCompose(Modifier, chargeUpMap, delClick = viewModel::delById)
+    @Composable
+    fun ChargeUpScreen(
+        modifier: Modifier = Modifier,
+        navController: NavHostController = platform.navController,
+        viewModel: ChargeUpViewModel = viewModel { ChargeUpViewModel() },
+
+        ) {
+        val navCompose = NavCompose()
+        val chargeUpMap by viewModel.chargeUpMap.collectAsState()
+        Scaffold(modifier, floatingActionButton = {
+            navCompose.FloatingAction(
+                toRoute = Route.CHARGE_UP_ADD,
+                description = stringResource(Res.string.add_charge_up_info)
+            )
+        }) {
+            /**
+             * 类似与常见的那种账单页面
+             * 根据时间排序
+             * 上面tap：年-月 总金额
+             * 下面一条条账单
+             */
+            ChargeUpCompose(Modifier, chargeUpMap, delClick = viewModel::delById, goDetail = {
+                navController.navigate("${Route.CHARGE_UP_DETAIL.route}/$it")
+            })
+        }
     }
 }
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChargeUpCompose(
     modifier: Modifier = Modifier,
     chargeUpMapList: Map<MonthSumCharge, List<ChargeUpDto>> = hashMapOf(),
-    delClick: (Long) -> Unit = {}
+    delClick: (Long) -> Unit = {},
+    goDetail: (Long) -> Unit = {}
 ) {
     val currentSlippingItem = remember { mutableStateOf<Long?>(null) }
 
@@ -92,9 +105,10 @@ fun ChargeUpCompose(
             stickyHeader {
                 StickyHeaderCompose(Modifier, it.key.currentDate, it.key.sumAmount)
             }
-            items(it.value,key = {it.id}) { item ->
-                SlippableChargeUp(chargeUpDto = item, currentSlippingItem = currentSlippingItem,
-                    delClick = delClick
+            items(it.value, key = { it.id!! }) { item ->
+                SlippableChargeUp(
+                    chargeUpDto = item, currentSlippingItem = currentSlippingItem,
+                    delClick = delClick, goDetail = goDetail
                 )
                 Spacer(Modifier.height(16.dp))
             }
@@ -123,7 +137,8 @@ fun SlippableChargeUp(
     modifier: Modifier = Modifier,
     chargeUpDto: ChargeUpDto,
     currentSlippingItem: MutableState<Long?>,
-    delClick: (Long) -> Unit = {}
+    delClick: (Long) -> Unit = {},
+    goDetail: (Long) -> Unit = {}
 ) {
     var isShowAlter by remember { mutableStateOf(false) }
     val density = LocalDensity.current
@@ -162,7 +177,7 @@ fun SlippableChargeUp(
     }
 
     DraggableItem(state = state, content = {
-        ChargeUpItem(modifier.fillMaxHeight(), chargeUpDto)
+        ChargeUpItem(modifier.fillMaxHeight(), chargeUpDto, goDetail)
     }, endAction = {
         DelAction(Modifier.fillMaxHeight().align(Alignment.CenterEnd)
             .background(MaterialTheme.colorScheme.error).width(defaultActionSize).fillMaxHeight()
@@ -174,7 +189,7 @@ fun SlippableChargeUp(
     })
 
     DeleteConfirmationDialog(showDialog = isShowAlter, onConfirmDelete = {
-        delClick(chargeUpDto.id)
+        delClick(chargeUpDto.id!!)
         isShowAlter = !isShowAlter
     }, onDismissRequest = {
         isShowAlter = !isShowAlter
@@ -184,10 +199,13 @@ fun SlippableChargeUp(
 
 @Composable
 fun ChargeUpItem(
-    modifier: Modifier = Modifier, chargeUpDto: ChargeUpDto
+    modifier: Modifier = Modifier, chargeUpDto: ChargeUpDto,
+    goDetail: (Long) -> Unit = {}
 ) {
     val amountTypeDto = chargeUpDto.amountType
-    ElevatedCard(modifier.heightIn(min = 100.dp), shape = RectangleShape) {
+    ElevatedCard(modifier.heightIn(min = 100.dp).clickable {
+        goDetail(chargeUpDto.id!!)
+    }, shape = RectangleShape) {
         Column(Modifier.padding(16.dp)) {
             // 日期
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

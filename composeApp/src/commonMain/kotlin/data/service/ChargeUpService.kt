@@ -3,15 +3,22 @@ package data.service
 import Platform
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOne
+import config.formatDateString
 import config.getCurrentDateTimeLong
 import data.Database
+import data.entiry.AmountTypeDto
 import data.entiry.ChargeUpDto
+import data.entiry.FileData
 import data.entiry.MonthSumCharge
 import data.entiry.toChargeUpDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -22,6 +29,8 @@ interface ChargeUpService {
     fun findAllChargeUp(): Flow<Map<MonthSumCharge, List<ChargeUpDto>>>
 
     fun deleteChargeUp(id: Long)
+
+    suspend fun findChargeUpById(id: Long): ChargeUpDto
 }
 
 class ChargeUpServiceImpl : ChargeUpService, KoinComponent {
@@ -32,7 +41,7 @@ class ChargeUpServiceImpl : ChargeUpService, KoinComponent {
     override fun saveChargeUp(chargeUpDto: ChargeUpDto) {
         // 保存图片补上路径
         chargeUpDto.files.filter { it.path == null }.forEach {
-            it.path = platform.saveFileImage(it.imageBitmap)
+            it.path = platform.saveFileImage(it.imageBitmap!!)
         }
         val filePaths =
             chargeUpDto.files.filter { it.path != null }.joinToString(separator = ",") { it.path!! }
@@ -61,5 +70,26 @@ class ChargeUpServiceImpl : ChargeUpService, KoinComponent {
 
     override fun deleteChargeUp(id: Long) {
         database.chargeUpQueries.delChargeUp(id)
+    }
+
+    override suspend fun findChargeUpById(id: Long): ChargeUpDto {
+        database.chargeUpQueries.selectChargeUpByid(id).executeAsOne().let {
+            // 处理files
+            val files = it.files?.split(",")?.map fileMap@{ path ->
+                return@fileMap withContext(Dispatchers.IO) {
+                    FileData(path, platform.downFileImage(path))
+                }
+            }?.toMutableList()
+
+            val dto = ChargeUpDto(
+                it.id,
+                it.content,
+                it.amount,
+                AmountTypeDto(it.amountTypeId, it.message),
+                files = files ?: mutableListOf(),
+                formatDateString(it.createTime)
+            )
+            return dto
+        }
     }
 }

@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.provider.CalendarContract
@@ -28,10 +29,15 @@ import config.toLong
 import data.entiry.EventRemind
 import data.entiry.FileData
 import data.entiry.RemindDto
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.onex.note.accredit.checkAccreditPermission
 import org.onex.note.accredit.getCalendarId
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import java.time.LocalDate
 import java.time.temporal.WeekFields
 import java.util.Locale
@@ -241,6 +247,16 @@ class AndroidPlatform(private val vc: NavHostController, private val context: Co
             e.printStackTrace()
         }
         return fileName
+    }
+
+    override suspend fun downFileImage(filePath: String): ImageBitmap? {
+        val directory = context.getExternalFilesDir(null) // 例如，应用的外部存储目录
+
+        // 读取本地文件中的图片
+        return withContext(Dispatchers.IO) {
+            val bitmap = BitmapFactory.decodeFile("${directory?.absolutePath}/$filePath")
+            return@withContext bitmap?.asImageBitmap()
+        }
     }
 
 }

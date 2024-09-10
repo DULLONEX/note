@@ -1,11 +1,13 @@
 package data.entiry
 
+import com.onex.note.ChargeUp
 import com.onex.note.SelectAllChargeUp
+import com.onex.note.SelectChargeUpByid
 import config.formatDateString
 
 data class ChargeUpDto(
     // id
-    val id:Long = 0L,
+    val id:Long?,
     // 内容
     val content: String = "",
 
@@ -38,4 +40,3 @@ fun SelectAllChargeUp.toChargeUpDto(): ChargeUpDto {
         formatDateString(this.createTime)
     )
 }
-
