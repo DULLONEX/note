@@ -26,6 +26,8 @@ interface ChargeUpService {
     // 实现保存逻辑
     fun saveChargeUp(chargeUpDto: ChargeUpDto)
 
+    fun updateChargeUp(chargeUpDto: ChargeUpDto)
+
     fun findAllChargeUp(): Flow<Map<MonthSumCharge, List<ChargeUpDto>>>
 
     fun deleteChargeUp(id: Long)
@@ -51,6 +53,16 @@ class ChargeUpServiceImpl : ChargeUpService, KoinComponent {
             filePaths,
             amountTypeId = chargeUpDto.amountType.id,
             getCurrentDateTimeLong()
+        )
+    }
+
+    override fun updateChargeUp(chargeUpDto: ChargeUpDto) {
+        database.chargeUpQueries.updateChargeUp(
+            chargeUpDto.content,
+            chargeUpDto.amount,
+            chargeUpDto.files.joinToString(separator = ",") { it.path!! },
+            chargeUpDto.amountType.id,
+            chargeUpDto.id!!
         )
     }
 

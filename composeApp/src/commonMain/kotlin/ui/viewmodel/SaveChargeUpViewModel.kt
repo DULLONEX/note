@@ -70,9 +70,11 @@ class SaveChargeUpViewModel : ViewModel(), KoinComponent {
             val errorString = checkAllInputInfo()
             if (errorString == null) {
                 if (chargeUpStatus.value.id == null) {
+                    // 保存
                     chargeUpService.saveChargeUp(chargeUpStatus.value)
                 } else {
-
+                    // 更新
+                    chargeUpService.updateChargeUp(chargeUpStatus.value)
                 }
                 result.complete(true)
             } else {
