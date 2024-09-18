@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilledTonalButton
@@ -62,40 +63,40 @@ import ui.screen.chargeUp.StickyHeaderCompose
 @Composable
 @Preview
 fun StickyHeaderComposePreview() {
-    StickyHeaderCompose(Modifier, "2024-9", "1000")
+    Row(
+        Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        CircularProgressIndicator()
+    }
+
 }
 
 @Composable
 @Preview
-fun Alter(){
+fun Alter() {
     @Composable
     fun DeleteConfirmationDialog(
-        showDialog: Boolean,
-        onConfirmDelete: () -> Unit,
-        onDismissRequest: () -> Unit
+        showDialog: Boolean, onConfirmDelete: () -> Unit, onDismissRequest: () -> Unit
     ) {
         if (showDialog) {
-            AlertDialog(
-                onDismissRequest = onDismissRequest,  // 点击对话框外面时关闭
+            AlertDialog(onDismissRequest = onDismissRequest,  // 点击对话框外面时关闭
                 title = {
                     Text(text = "确认删除")
-                },
-                text = {
+                }, text = {
                     Text(text = "你确定要删除这个项目吗？此操作无法撤销。")
-                },
-                confirmButton = {
+                }, confirmButton = {
                     TextButton(onClick = {
                         onConfirmDelete()  // 点击确认按钮时执行删除操作
                     }) {
                         Text(text = "删除")
                     }
-                },
-                dismissButton = {
+                }, dismissButton = {
                     TextButton(onClick = onDismissRequest) {
                         Text(text = "取消")
                     }
-                }
-            )
+                })
         }
     }
     DeleteConfirmationDialog(showDialog = true, onConfirmDelete = {}, onDismissRequest = {})
@@ -108,8 +109,6 @@ fun Alter(){
 fun DraggableDemo() {
 
     BehindMotionSwipeDemo()
-
-
 
 
 }
@@ -143,8 +142,7 @@ fun LazyColumPreview() {
 
         items(items.subList(0, 200)) { item ->
             Text(
-                text = "Item $item",
-                modifier = Modifier
+                text = "Item $item", modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth()
             )
@@ -163,8 +161,7 @@ fun LazyColumPreview() {
 
         items(items.subList(200, 400)) { item ->
             Text(
-                text = "Item $item",
-                modifier = Modifier
+                text = "Item $item", modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth()
             )
@@ -180,34 +177,29 @@ fun LazyColumPreview() {
 fun ImagePreview() {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) { data ->
-                Snackbar(
-                    snackbarData = data,
-                    backgroundColor = MaterialTheme.colorScheme.errorContainer, // 设置背景颜色为警告颜色
-                    contentColor = MaterialTheme.colorScheme.error // 设置文字颜色为白色
-                )
-            }
-        },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                text = { Text("Show snackbar") },
-                icon = { Icon(Icons.Filled.Add, contentDescription = "") },
-                onClick = {
-                    scope.launch {
-                        // 如果 Snackbar 正在显示，则立即取消它
-                        snackbarHostState.currentSnackbarData?.dismiss()
-
-                        // 然后显示新的 Snackbar
-                        snackbarHostState.showSnackbar("Snackbar")
-                    }
-                }
+    Scaffold(snackbarHost = {
+        SnackbarHost(hostState = snackbarHostState) { data ->
+            Snackbar(
+                snackbarData = data,
+                backgroundColor = MaterialTheme.colorScheme.errorContainer, // 设置背景颜色为警告颜色
+                contentColor = MaterialTheme.colorScheme.error // 设置文字颜色为白色
             )
         }
-    ) { contentPadding ->
+    }, floatingActionButton = {
+        ExtendedFloatingActionButton(text = { Text("Show snackbar") },
+            icon = { Icon(Icons.Filled.Add, contentDescription = "") },
+            onClick = {
+                scope.launch {
+                    // 如果 Snackbar 正在显示，则立即取消它
+                    snackbarHostState.currentSnackbarData?.dismiss()
+
+                    // 然后显示新的 Snackbar
+                    snackbarHostState.showSnackbar("Snackbar")
+                }
+            })
+    }) { contentPadding ->
         // Screen content
-        Box(Modifier.padding(contentPadding)) {  }
+        Box(Modifier.padding(contentPadding)) { }
     }
 
 }

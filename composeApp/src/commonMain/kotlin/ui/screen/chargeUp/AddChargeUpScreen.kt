@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
@@ -62,6 +63,7 @@ import androidx.navigation.NavHostController
 import config.getStringResource
 import data.entiry.AmountTypeDto
 import data.entiry.FileData
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.add_image
@@ -74,6 +76,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import ui.AlterSnackbar
 import ui.CenteredTextField
+import ui.LoadCompose
 import ui.PictureViewer
 import ui.TextInputCompose
 import ui.theme.TransparentOutlinedTextFieldColors
@@ -91,21 +94,29 @@ class AddChargeUpCompose : KoinComponent {
         id: Long? = null
     ) {
         val scope = rememberCoroutineScope()
-        // snackBar 提示
         val snackarHostState = remember { SnackbarHostState() }
         val errorInfo by viewModel.errorInfo.collectAsState()
+
+        // 加载数据后控制 UI 显示的状态
+        var isReadyToShowUI by remember { mutableStateOf(false) }
+
+        // Snackbar 提示
         errorInfo?.let {
             val stringResource = stringResource(it)
             scope.launch {
                 snackarHostState.showSnackbar(stringResource)
             }
         }
+
         LaunchedEffect(id) {
             if (id != null) {
+                delay(200)  // 延迟 200 毫秒
                 viewModel.loadChargeUpById(id)
             }
+            isReadyToShowUI = true  // 只有在延迟后设置状态为 true
         }
 
+        // 如果 UI 准备好才显示界面
         val navCompose = NavCompose()
         Scaffold(modifier,
             snackbarHost = { SnackbarHost(hostState = snackarHostState) { AlterSnackbar(it) } },
@@ -118,8 +129,14 @@ class AddChargeUpCompose : KoinComponent {
                     }
                 })
             }) { innerPadding ->
-            ChargeUpCompose(Modifier.fillMaxSize().padding(innerPadding))
+            if (isReadyToShowUI) {
+                ChargeUpCompose(Modifier.fillMaxSize().padding(innerPadding))
+            } else {
+                // 显示加载状态
+                LoadCompose(Modifier.padding(innerPadding))
+            }
         }
+
     }
 
 
@@ -402,15 +419,16 @@ fun AmountInputCompose(
 
     ) {
     val outline = MaterialTheme.colorScheme.outline
-    OutlinedTextField(modifier = modifier.drawWithContent {
-        drawContent()
-        drawLine(
-            color = outline,
-            start = Offset(x = 0f, y = size.height),
-            end = Offset(x = size.width, y = size.height),
-            strokeWidth = 2f
-        )
-    },
+    OutlinedTextField(
+        modifier = modifier.drawWithContent {
+            drawContent()
+            drawLine(
+                color = outline,
+                start = Offset(x = 0f, y = size.height),
+                end = Offset(x = size.width, y = size.height),
+                strokeWidth = 2f
+            )
+        },
         value = value,
         onValueChange = onChange,
         placeholder = {
