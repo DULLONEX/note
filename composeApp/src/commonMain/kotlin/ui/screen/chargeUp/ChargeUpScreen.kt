@@ -127,7 +127,7 @@ fun StickyHeaderCompose(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(date, style = MaterialTheme.typography.titleLarge)
-        Text("¥: -$sumAmount", style = MaterialTheme.typography.titleMedium)
+        Text("-$sumAmount¥", style = MaterialTheme.typography.titleMedium)
     }
 }
 
@@ -222,7 +222,7 @@ fun ChargeUpItem(
                     )
                     Spacer(Modifier.width(4.dp))
                     Text(
-                        "¥: -${chargeUpDto.amount}",
+                        "-${chargeUpDto.amount}¥",
                         Modifier.alignByBaseline(),
                         style = MaterialTheme.typography.titleSmall
                     )
