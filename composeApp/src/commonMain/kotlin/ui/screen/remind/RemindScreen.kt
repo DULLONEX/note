@@ -59,6 +59,7 @@ import data.entiry.ShowRemind
 import kotlinx.coroutines.launch
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.add_remind_info
+import note.composeapp.generated.resources.delete
 import org.jetbrains.compose.resources.stringResource
 import ui.MyNewIndicator
 import ui.NoRippleInteractionSource
@@ -197,7 +198,8 @@ fun BottomSheet(
                 delClick(id)
                 showChange()
             }) {
-                Text("删除")
+                
+                Text(stringResource(Res.string.delete))
             }
         }
     }

@@ -11,6 +11,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
@@ -51,6 +52,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -80,6 +82,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.cancel
 import note.composeapp.generated.resources.confirm
@@ -184,6 +187,7 @@ fun NumberPicker(
     defaultSelectedNumber: Int = 0,
     onChange: (Int) -> Unit = {}
 ) {
+    val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     val outline = MaterialTheme.colorScheme.outline
 
@@ -252,6 +256,14 @@ fun NumberPicker(
                     text = value.toString(),
                     fontSize = 24.sp,
                     textAlign = TextAlign.Center,
+                    modifier = modifier.clickable(
+                        indication = null, // 去除波纹效果
+                        interactionSource = remember { MutableInteractionSource() } // 必须与 indication 搭配使用
+                    ) {
+                        scope.launch {
+                            listState.animateScrollToItem(value - numbers.first, 0)
+                        }
+                    }
                 )
             }
         }
@@ -510,7 +522,7 @@ fun AlterSnackbar(data: SnackbarData) {
 
 
 @Composable
-fun LoadCompose(modifier: Modifier = Modifier){
+fun LoadCompose(modifier: Modifier = Modifier) {
     Row(
         modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.Center,
