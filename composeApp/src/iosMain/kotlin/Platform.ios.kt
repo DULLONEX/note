@@ -13,9 +13,12 @@ import data.entiry.FileData
 import data.entiry.RemindDto
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.get
+import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.refTo
 import kotlinx.cinterop.reinterpret
+import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
@@ -26,6 +29,7 @@ import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.skia.Image
 import platform.CoreGraphics.CGBitmapContextCreate
 import platform.CoreGraphics.CGBitmapContextCreateImage
+import platform.CoreGraphics.CGBitmapInfo
 import platform.CoreGraphics.CGColorSpaceCreateDeviceRGB
 import platform.CoreGraphics.CGImageAlphaInfo
 import platform.EventKit.EKAlarm
@@ -67,22 +71,43 @@ fun ImageBitmap.toUIImage(): UIImage {
     val height = this.height
     val buffer = IntArray(width * height)
 
+    // Read pixels into buffer
     this.readPixels(buffer)
 
-    val colorSpace = CGColorSpaceCreateDeviceRGB()
-    val context = CGBitmapContextCreate(
-        data = buffer.refTo(0),
-        width = width.toULong(),
-        height = height.toULong(),
-        bitsPerComponent = 8u,
-        bytesPerRow = (4 * width).toULong(),
-        space = colorSpace,
-        bitmapInfo = CGImageAlphaInfo.kCGImageAlphaPremultipliedLast.value
-    )
+    // Convert the buffer (ARGB) into a byte array (RGBA)
+    val rgbaBuffer = ByteArray(buffer.size * 4)
+    buffer.forEachIndexed { index, argb ->
+        val argbColor = argb
+        rgbaBuffer[index * 4 + 0] = (argbColor shr 16 and 0xFF).toByte()  // R
+        rgbaBuffer[index * 4 + 1] = (argbColor shr 8 and 0xFF).toByte()   // G
+        rgbaBuffer[index * 4 + 2] = (argbColor and 0xFF).toByte()         // B
+        rgbaBuffer[index * 4 + 3] = (argbColor shr 24 and 0xFF).toByte()  // A
+    }
 
-    val cgImage = CGBitmapContextCreateImage(context)
-    return cgImage!!.let { UIImage.imageWithCGImage(it) }
+    return memScoped {
+        // Create color space
+        val colorSpace = CGColorSpaceCreateDeviceRGB()
+        // Create context
+        rgbaBuffer.usePinned { pinnedBuffer ->
+            val context = CGBitmapContextCreate(
+                data = pinnedBuffer.addressOf(0),
+                width = width.toULong(),
+                height = height.toULong(),
+                bitsPerComponent = 8u,
+                bytesPerRow = (4 * width).toULong(),
+                space = colorSpace,
+                bitmapInfo = CGImageAlphaInfo.kCGImageAlphaPremultipliedLast.value
+            )
+
+            // Create CGImage from context
+            val cgImage = CGBitmapContextCreateImage(context)
+
+            // Return UIImage created from CGImage
+            UIImage.imageWithCGImage(cgImage)
+        }
+    }
 }
+
 
 fun LocalDateTime.toNSDate(): NSDate {
     val calendar = NSCalendar.currentCalendar
@@ -118,19 +143,19 @@ class iOSPlatform(private val vc: NavHostController) : Platform {
     // ios添加日历记录信息
     @OptIn(ExperimentalForeignApi::class)
     override fun addCalendarEvent(remindDto: RemindDto): String {
-        val eventStore = EKEventStore()
-        val event = EKEvent.eventWithEventStore(eventStore)
-        event.title = remindDto.title
-        event.notes = remindDto.details
-        event.startDate = remindDto.startDate.toNSDate()
-        event.endDate = remindDto.endDate.toNSDate()
-        event.calendar = eventStore.defaultCalendarForNewEvents
-        event.addAlarm(EKAlarm().apply {
-            relativeOffset = -(remindDto.beforeMinutes.toDouble() * 60)
-        })
+            val eventStore = EKEventStore()
+            val event = EKEvent.eventWithEventStore(eventStore)
+            event.title = remindDto.title
+            event.notes = remindDto.details
+            event.startDate = remindDto.startDate.toNSDate()
+            event.endDate = remindDto.endDate.toNSDate()
+            event.calendar = eventStore.defaultCalendarForNewEvents
+            event.addAlarm(EKAlarm().apply {
+                relativeOffset = -(remindDto.beforeMinutes.toDouble() * 60)
+            })
 
-        eventStore.saveEvent(event, EKSpan.EKSpanFutureEvents, null)
-        return event.eventIdentifier!!
+            eventStore.saveEvent(event, EKSpan.EKSpanFutureEvents, null)
+            return event.eventIdentifier!!
     }
 
     override fun queryCalendarEvents(): List<EventRemind> {

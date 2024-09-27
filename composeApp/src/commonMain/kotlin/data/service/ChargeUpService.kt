@@ -57,6 +57,10 @@ class ChargeUpServiceImpl : ChargeUpService, KoinComponent {
     }
 
     override fun updateChargeUp(chargeUpDto: ChargeUpDto) {
+        // 保存图片补上路径
+        chargeUpDto.files.filter { it.path == null }.forEach {
+            it.path = platform.saveFileImage(it.imageBitmap!!)
+        }
         database.chargeUpQueries.updateChargeUp(
             chargeUpDto.content,
             chargeUpDto.amount,

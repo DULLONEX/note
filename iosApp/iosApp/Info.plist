@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>NSCalendarsUsageDescription</key>
-    <string>We need access to your calendar to add events.</string>
+    <string>应用需要访问日历以添加提醒事件。</string>
     <key>NSCameraUsageDescription</key>
     <string>We need access to your camera for...</string>
     <key>NSPhotoLibraryUsageDescription</key>
