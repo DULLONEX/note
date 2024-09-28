@@ -44,6 +44,7 @@ import platform.Foundation.NSCalendarUnitWeekOfYear
 import platform.Foundation.NSData
 import platform.Foundation.NSDate
 import platform.Foundation.NSDateComponents
+import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSLocale
 import platform.Foundation.NSURL
@@ -135,27 +136,39 @@ fun NSDate.toLocalDateTime(): LocalDateTime {
     return instant.toLocalDateTime(zoneId)
 }
 
+@OptIn(ExperimentalForeignApi::class)
+fun requestCalendarAccess(completion: (granted: Boolean, error: NSError?) -> Unit) {
+    val eventStore = EKEventStore()
+
+    eventStore.requestAccessToEntityType(EKEntityType.EKEntityTypeEvent) { granted, error ->
+        completion(granted, error)
+    }
+}
 
 class iOSPlatform(private val vc: NavHostController) : Platform {
     override val navController: NavHostController
         @Composable get() = vc
 
-    // ios添加日历记录信息
     @OptIn(ExperimentalForeignApi::class)
     override fun addCalendarEvent(remindDto: RemindDto): String {
-            val eventStore = EKEventStore()
-            val event = EKEvent.eventWithEventStore(eventStore)
-            event.title = remindDto.title
-            event.notes = remindDto.details
-            event.startDate = remindDto.startDate.toNSDate()
-            event.endDate = remindDto.endDate.toNSDate()
-            event.calendar = eventStore.defaultCalendarForNewEvents
-            event.addAlarm(EKAlarm().apply {
-                relativeOffset = -(remindDto.beforeMinutes.toDouble() * 60)
-            })
 
-            eventStore.saveEvent(event, EKSpan.EKSpanFutureEvents, null)
-            return event.eventIdentifier!!
+        val eventStore = EKEventStore()
+        val event = EKEvent.eventWithEventStore(eventStore)
+
+        // 配置事件属性
+        event.title = remindDto.title
+        event.notes = remindDto.details
+        event.startDate = remindDto.startDate.toNSDate()
+        event.endDate = remindDto.endDate.toNSDate()
+        event.calendar = eventStore.defaultCalendarForNewEvents
+        event.addAlarm(EKAlarm().apply {
+            relativeOffset = -(remindDto.beforeMinutes.toDouble() * 60)
+        })
+
+        // 保存事件
+        eventStore.saveEvent(event, EKSpan.EKSpanFutureEvents, null)
+        return event.eventIdentifier!!
+
     }
 
     override fun queryCalendarEvents(): List<EventRemind> {
@@ -165,8 +178,8 @@ class iOSPlatform(private val vc: NavHostController) : Platform {
         // 获取所有日历
         val calendars: List<EKCalendar> =
             eventStore.calendarsForEntityType(EKEntityType.EKEntityTypeEvent) as List<EKCalendar>
-        // 过滤系统日历，通常通过 `calendar.isSubscribed` 或 `calendar.type` 来排除系统日历
-        val userCalendars = calendars.filter { it.type == EKCalendarType.EKCalendarTypeLocal }
+        val userCalendars = calendars.filter { it.type == EKCalendarType.EKCalendarTypeCalDAV }
+
         userCalendars.map { calendar ->
             val predicate = eventStore.predicateForEventsWithStartDate(
                 getTodayZero().toNSDate(),

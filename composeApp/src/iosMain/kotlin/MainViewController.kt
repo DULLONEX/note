@@ -10,6 +10,11 @@ import platform.UIKit.UIViewController
 fun ComposeEntryPointWithUIViewController(
     createUIViewController: () -> UIViewController
 ): UIViewController = ComposeUIViewController {
+    // 申请权限
+    requestCalendarAccess { granted, error ->
+
+    }
+
     val navController = rememberNavController()
     startKoin {
         modules(iosModule)
