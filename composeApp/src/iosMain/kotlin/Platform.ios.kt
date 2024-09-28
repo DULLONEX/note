@@ -232,54 +232,58 @@ class iOSPlatform(private val vc: NavHostController) : Platform {
         delFile: (ImageBitmap) -> Unit,
         content: @Composable (
             imageBitmapArray: List<ImageBitmap>, addPhoto: () -> Unit, delImageChange: (ImageBitmap) -> Unit
-        ) -> Unit,
-
-        ) {
+        ) -> Unit
+    ) {
         val imagePicker = UIImagePickerController()
 
-        val imageBitmapListState by snapshotFlow { fileDataList.map { it?.imageBitmap } }.collectAsState(
-            mutableListOf()
-        )
-        // 图片选择窗口
+        // 使用 snapshotFlow 来监听 fileDataList 的变化
+        val imageBitmapListState by snapshotFlow { fileDataList.mapNotNull { it?.imageBitmap } }
+            .collectAsState(initial = emptyList())
+
+        // 图片选择窗口的委托
         val galleryDelegate = remember {
             object : NSObject(), UIImagePickerControllerDelegateProtocol,
                 UINavigationControllerDelegateProtocol {
                 override fun imagePickerController(
                     picker: UIImagePickerController, didFinishPickingMediaWithInfo: Map<Any?, *>
                 ) {
-                    val image =
-                        didFinishPickingMediaWithInfo[UIImagePickerControllerEditedImage] as? UIImage
-                            ?: didFinishPickingMediaWithInfo[UIImagePickerControllerOriginalImage] as? UIImage
+                    // 确保只获取原始图片
+                    val image = didFinishPickingMediaWithInfo[UIImagePickerControllerOriginalImage] as? UIImage
 
+                    // 将图片转换为字节数组
                     val byteArray: ByteArray? = image?.let {
-                        val imageData = UIImageJPEGRepresentation(it, 0.99)
+                        val imageData = UIImageJPEGRepresentation(it, 0.99) // 高质量压缩
                         val bytes = imageData?.bytes?.reinterpret<ByteVar>()
                         val length = imageData?.length?.toInt() ?: 0
                         ByteArray(length) { index -> bytes!![index] }
                     }
+
+                    // 将字节数组转换为 ImageBitmap
                     val img = byteArray?.let {
                         Image.makeFromEncoded(it).toComposeImageBitmap()
                     }
-                    addFile(img!!)
+
+                    // 添加文件到列表
+                    img?.let { addFile(it) }
+
+                    // 关闭图片选择器
                     picker.dismissViewControllerAnimated(true, null)
                 }
             }
         }
 
-
-        imagePicker.sourceType =
-            UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypePhotoLibrary
-        imagePicker.allowsEditing = true
+        // 配置 UIImagePickerController
+        imagePicker.sourceType = UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypePhotoLibrary
+        imagePicker.allowsEditing = false // 禁用编辑以确保获取原图
         imagePicker.setDelegate(galleryDelegate)
 
-        content(imageBitmapListState.filterNotNull().toList(), {
-            // 开启选择
+        // 使用传入的 content Composable 来处理界面展示
+        content(imageBitmapListState, {
+            // 打开图片选择器
             UIApplication.sharedApplication.keyWindow?.rootViewController?.presentViewController(
                 imagePicker, true, null
             )
         }, { delFile(it) })
-
-
     }
 
     override fun saveFileImage(imageBitmap: ImageBitmap): String {
