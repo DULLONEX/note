@@ -12,6 +12,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.LocalDateTime
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.error_no_amount1
 import note.composeapp.generated.resources.error_no_amount2
@@ -116,6 +117,12 @@ class SaveChargeUpViewModel : ViewModel(), KoinComponent {
         }
     }
 
+    fun fillTimeChange(value: LocalDateTime) {
+        // 判断是否全是数据
+        viewModelScope.launch {
+            chargeUpStatus.emit(chargeUpStatus.value.copy(fillTime = value))
+        }
+    }
 
     fun amountTypeSelect(amountTypeDto: AmountTypeDto) {
         viewModelScope.launch {

@@ -43,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import config.Route
+import config.formatTimeToString
+import config.formatToString
 import config.getStringResource
 import data.entiry.ChargeUpDto
 import data.entiry.MonthSumCharge
@@ -209,7 +211,7 @@ fun ChargeUpItem(
         Column(Modifier.padding(16.dp)) {
             // 日期
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(chargeUpDto.createTime, style = MaterialTheme.typography.titleMedium)
+                Text(chargeUpDto.fillTime.formatToString(), style = MaterialTheme.typography.titleMedium)
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(
                         if (amountTypeDto.whetherSystem) stringResource(

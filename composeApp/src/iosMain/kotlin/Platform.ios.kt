@@ -44,12 +44,15 @@ import platform.Foundation.NSCalendarUnitWeekOfYear
 import platform.Foundation.NSData
 import platform.Foundation.NSDate
 import platform.Foundation.NSDateComponents
+import platform.Foundation.NSDecimal
+import platform.Foundation.NSDecimalNumber
 import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSLocale
 import platform.Foundation.NSURL
 import platform.Foundation.NSUUID
 import platform.Foundation.URLByAppendingPathComponent
+import platform.Foundation.addObserver
 import platform.Foundation.currentLocale
 import platform.Foundation.dataWithContentsOfFile
 import platform.Foundation.languageCode
@@ -355,4 +358,13 @@ actual fun isSameWeek(
     )
 
     return isDate1SameWeekAsCurrent && isDate2SameWeekAsCurrent
+}
+
+actual fun sumAmount(amount: List<String>): String {
+    // 使用 NSDecimalNumber 进行高精度的加法运算
+    val total = amount.fold(NSDecimalNumber.zero) { sum, currentAmount ->
+        sum.decimalNumberByAdding(NSDecimalNumber(currentAmount))
+    }
+    // 转换为字符串返回
+    return total.stringValue
 }

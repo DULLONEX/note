@@ -40,6 +40,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -58,13 +59,20 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import config.convertLocalDateTime
+import config.formatToString
+import config.getCurrentDateTime
 import config.getStringResource
+import config.toLong
+import config.withHourAndMinute
 import data.entiry.AmountTypeDto
 import data.entiry.FileData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.add_image
 import note.composeapp.generated.resources.notes
@@ -75,10 +83,12 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import ui.AlterSnackbar
+import ui.AnimationTextShow
 import ui.CenteredTextField
 import ui.LoadCompose
 import ui.PictureViewer
 import ui.TextInputCompose
+import ui.screen.remind.DateDayChooseItem
 import ui.theme.TransparentOutlinedTextFieldColors
 import ui.viewmodel.SaveChargeUpViewModel
 
@@ -110,8 +120,9 @@ class AddChargeUpCompose : KoinComponent {
 
         LaunchedEffect(id) {
             if (id != null) {
-                delay(200)  // 延迟 200 毫秒
                 viewModel.loadChargeUpById(id)
+                delay(200)  // 延迟 200 毫秒
+
             }
             isReadyToShowUI = true  // 只有在延迟后设置状态为 true
         }
@@ -156,7 +167,9 @@ class AddChargeUpCompose : KoinComponent {
                 textValue = chargeUpStatus.content,
                 textOnChange = viewModel::contentChange,
                 amountValue = chargeUpStatus.amount,
-                amountOnChange = viewModel::amountChange
+                amountOnChange = viewModel::amountChange,
+                selectedDate = chargeUpStatus.fillTime,
+                onDateChange = viewModel::fillTimeChange
             )
             //类型
             AmountTypeCompose(
@@ -367,6 +380,7 @@ fun AmountTypeItem(
  * 头部用于结合输入和金钱选择
  *
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HeadCompose(
     modifier: Modifier = Modifier,
@@ -374,8 +388,34 @@ fun HeadCompose(
     textOnChange: (String) -> Unit = {},
     amountValue: String = "",
     amountOnChange: (String) -> Unit = {},
+    selectedDate: LocalDateTime = getCurrentDateTime(),
+    onDateChange: (LocalDateTime) -> Unit = {},
 ) {
+    var dateSelect by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+    LaunchedEffect(dateSelect) {
+        datePickerState.apply { this.selectedDateMillis = selectedDate.toLong() }
+    }
+    DateDayChooseItem(dateSelect = dateSelect, dateSelectChange = {
+        dateSelect = !dateSelect
+    }, selectedDateChange = {
+        // 时分 不用修改
+        onDateChange(
+            convertLocalDateTime(it).withHourAndMinute(
+                selectedDate.hour, selectedDate.minute
+            )
+        )
+    }, datePickerState = datePickerState)
+
     Column(modifier.fillMaxWidth()) {
+        // 用于填写消费日期
+        Text(
+            text = selectedDate.formatToString(), modifier = Modifier.padding(start = 4.dp).clickable {
+                dateSelect = !dateSelect
+            }, style = MaterialTheme.typography.bodyLarge.copy(fontSize = 32.sp)
+        )
+        HorizontalDivider()
+
         /**
          * 备注用于填写此部消费备注信息
          */
@@ -430,7 +470,11 @@ fun AmountInputCompose(
             )
         },
         value = value,
-        onValueChange = onChange,
+        onValueChange = { newValue ->
+            if (newValue.matches(Regex("^\\d*\\.?\\d*\$"))) {  // Allows numbers with optional decimal point
+                onChange(newValue)
+            }
+        },
         placeholder = {
             Text("0.00", style = textStyle)
         },
@@ -441,7 +485,7 @@ fun AmountInputCompose(
         singleLine = true,
         colors = MaterialTheme.colorScheme.TransparentOutlinedTextFieldColors,
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number
+            keyboardType = KeyboardType.Decimal  // Allows decimal point input
         )
     )
 }

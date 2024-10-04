@@ -129,6 +129,6 @@ sqldelight {
         create("AppDatabase") {
             packageName.set("com.onex")
         }
-
+        version = 2
     }
 }

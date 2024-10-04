@@ -4,8 +4,11 @@ import Platform
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
+import config.convertLocalDateTime
 import config.formatDateString
+import config.formatToString
 import config.getCurrentDateTimeLong
+import config.toLong
 import data.Database
 import data.entiry.AmountTypeDto
 import data.entiry.ChargeUpDto
@@ -21,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import sumAmount
 
 interface ChargeUpService {
     // 实现保存逻辑
@@ -52,7 +56,8 @@ class ChargeUpServiceImpl : ChargeUpService, KoinComponent {
             chargeUpDto.amount,
             filePaths,
             amountTypeId = chargeUpDto.amountType.id,
-            getCurrentDateTimeLong()
+            fillTime = chargeUpDto.fillTime.toLong(),
+            getCurrentDateTimeLong(),
         )
     }
 
@@ -66,6 +71,7 @@ class ChargeUpServiceImpl : ChargeUpService, KoinComponent {
             chargeUpDto.amount,
             chargeUpDto.files.joinToString(separator = ",") { it.path!! },
             chargeUpDto.amountType.id,
+            fillTime = chargeUpDto.fillTime.toLong(),
             chargeUpDto.id!!
         )
     }
@@ -76,10 +82,11 @@ class ChargeUpServiceImpl : ChargeUpService, KoinComponent {
                 array.map { chargeUp ->
                     chargeUp.toChargeUpDto()
                 }.groupBy(keySelector = {
-                    val split = it.createTime.split("/")
+                    val split = it.fillTime.formatToString().split("/")
                     "${split[0]}/${split[1]}"
                 }).mapKeys { map ->
-                    MonthSumCharge(map.value.sumOf { it.amount.toDouble() }.toString(), map.key)
+                    val amountList = map.value.map { it.amount }.toList()
+                    MonthSumCharge(sumAmount(amountList), map.key)
                 }
             }
     }
@@ -103,6 +110,7 @@ class ChargeUpServiceImpl : ChargeUpService, KoinComponent {
                 it.amount,
                 AmountTypeDto(it.amountTypeId, it.message),
                 files = files ?: mutableListOf(),
+                convertLocalDateTime(it.fillTime),
                 formatDateString(it.createTime)
             )
             return dto

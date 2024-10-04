@@ -7,6 +7,7 @@ CREATE TABLE ChargeUp(
     amount TEXT NOT NULL ,
     files TEXT, -- 会按照,进行分割
     amountTypeId INTEGER  NOT NULL REFERENCES AmountType(id),
+    fillTime INTEGER NOT NULL, -- 新增的填写日期
     createTime  INTEGER NOT NULL,
     whetherDelete INTEGER AS Boolean DEFAULT 0 NOT NULL
 );
@@ -21,11 +22,11 @@ INNER JOIN AmountType AS t2 ON t1.amountTypeId = t2.id
 WHERE t1.id = ? AND t1.whetherDelete = 0;
 
 insertChargeUp:
-INSERT INTO ChargeUp(content,amount,files,amountTypeId,createTime)
-VALUES (?,?,?,?,?);
+INSERT INTO ChargeUp(content,amount,files,amountTypeId,fillTime,createTime)
+VALUES (?,?,?,?,?,?);
 
 updateChargeUp:
-UPDATE ChargeUp SET content = ?,amount = ?,files = ?,amountTypeId = ? WHERE id = ?;
+UPDATE ChargeUp SET content = ?,amount = ?,files = ?,amountTypeId = ?,fillTime = ? WHERE id = ?;
 
 delChargeUp:
 UPDATE ChargeUp SET whetherDelete = 1 WHERE id = ?;

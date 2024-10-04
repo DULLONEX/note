@@ -36,6 +36,8 @@ import org.onex.note.accredit.getCalendarId
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.net.HttpURLConnection
 import java.net.URL
 import java.time.LocalDate
@@ -285,4 +287,9 @@ actual fun isSameWeek(
             && weekOfYear1 == weekOfYearCurrent
             && year1 == currentYear
 
+}
+
+actual fun sumAmount(amount: List<String>): String {
+
+    return amount.sumOf { BigDecimal(it).setScale(2, RoundingMode.UP) }.toPlainString()
 }

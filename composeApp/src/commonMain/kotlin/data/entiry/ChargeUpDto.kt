@@ -3,7 +3,11 @@ package data.entiry
 import com.onex.note.ChargeUp
 import com.onex.note.SelectAllChargeUp
 import com.onex.note.SelectChargeUpByid
+import config.convertLocalDateTime
 import config.formatDateString
+import config.getCurrentDateTime
+import config.getCurrentDateTimeLong
+import kotlinx.datetime.LocalDateTime
 
 data class ChargeUpDto(
     // id
@@ -19,6 +23,9 @@ data class ChargeUpDto(
 
     // files
     val files: MutableList<FileData> = mutableListOf(),
+
+    // 填写时间
+    val fillTime: LocalDateTime = getCurrentDateTime(),
 
     // 创建时间
     val createTime: String = "",
@@ -37,6 +44,7 @@ fun SelectAllChargeUp.toChargeUpDto(): ChargeUpDto {
         this.amount,
         AmountTypeDto(this.amountTypeId, this.message),
         mutableListOf(),
+        convertLocalDateTime(this.fillTime),
         formatDateString(this.createTime)
     )
 }

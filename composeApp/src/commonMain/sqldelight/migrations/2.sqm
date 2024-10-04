@@ -1,0 +1,2 @@
+ALTER TABLE ChargeUp ADD COLUMN fillTime INTEGER NOT NULL DEFAULT 0;
+UPDATE ChargeUp SET fillTime = createTime;

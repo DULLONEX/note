@@ -36,3 +36,11 @@ interface Platform {
  * @return
  */
 expect fun isSameWeek(year1: Int, month1: Int, day1: Int, year2: Int, month2: Int, day2: Int): Boolean
+
+/**
+ * 总计金额
+ *
+ * @param amount
+ * @return
+ */
+expect fun sumAmount(amount:List<String>):String
