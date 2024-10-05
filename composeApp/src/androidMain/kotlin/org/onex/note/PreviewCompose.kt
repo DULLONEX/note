@@ -54,11 +54,47 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import data.entiry.AmountTypeDto
+import data.entiry.ChargeUpDto
 import kotlinx.coroutines.launch
 import ui.CenteredTextField
 import ui.screen.chargeUp.AddChargeUpCompose
 import ui.screen.chargeUp.AmountInputCompose
+import ui.screen.chargeUp.ChargeUpItem
 import ui.screen.chargeUp.StickyHeaderCompose
+
+@Composable
+@Preview
+fun ChargeUpItemPreview() {
+    Column(Modifier.fillMaxSize()) {
+        ChargeUpItem(
+            chargeUpDto = ChargeUpDto(
+                1,
+                "买牛奶",
+                "11159.90",
+                AmountTypeDto(5, "购物", false)
+            )
+        )
+        ChargeUpItem(
+            chargeUpDto = ChargeUpDto(
+                2,
+                "买牛奶",
+                "1.90",
+                AmountTypeDto(5, "购物", false)
+            )
+        )
+        ChargeUpItem(
+            chargeUpDto = ChargeUpDto(
+                3,
+                "买牛奶",
+                "12.90",
+                AmountTypeDto(5, "购物", false)
+            )
+        )
+    }
+
+}
+
 
 @Composable
 @Preview

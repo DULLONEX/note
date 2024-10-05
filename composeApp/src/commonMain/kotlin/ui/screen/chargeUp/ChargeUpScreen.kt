@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -211,22 +212,31 @@ fun ChargeUpItem(
         Column(Modifier.padding(16.dp)) {
             // 日期
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(chargeUpDto.fillTime.formatToString(), style = MaterialTheme.typography.titleMedium)
-                Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    modifier = Modifier.weight(0.4f),
+                    text = chargeUpDto.fillTime.formatToString(),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Row(
+                    modifier = Modifier.weight(0.6f),
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(
                         if (amountTypeDto.whetherSystem) stringResource(
                             getStringResource(
                                 amountTypeDto.message
                             )
                         ) else amountTypeDto.message,
-                        Modifier.alignByBaseline(),
-                        style = MaterialTheme.typography.labelLarge
+                        Modifier.alignByBaseline().weight(0.6f),
+                        style = MaterialTheme.typography.labelLarge,
+                        textAlign = TextAlign.End
                     )
-                    Spacer(Modifier.width(4.dp))
                     Text(
                         "-${chargeUpDto.amount}¥",
-                        Modifier.alignByBaseline(),
-                        style = MaterialTheme.typography.titleSmall
+                        Modifier.alignByBaseline().weight(0.4f),
+                        style = MaterialTheme.typography.titleSmall,
+                        textAlign = TextAlign.End
                     )
                 }
             }
