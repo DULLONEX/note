@@ -38,11 +38,12 @@ data class MonthSumCharge(
 )
 
 fun SelectAllChargeUp.toChargeUpDto(): ChargeUpDto {
+
     return ChargeUpDto(
         this.id,
         this.content,
         this.amount,
-        AmountTypeDto(this.amountTypeId, this.message),
+        AmountTypeDto(this.amountTypeId, this.message,this.whetherSystem),
         mutableListOf(),
         convertLocalDateTime(this.fillTime),
         formatDateString(this.createTime)

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -41,6 +42,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -330,12 +332,14 @@ fun AmountTypeBottomSheet(
     amountType: AmountTypeDto = AmountTypeDto(0, "", false)
 ) {
     var text by remember { mutableStateOf(amountType.message) }
-    ModalBottomSheet(modifier = modifier.heightIn(min = 300.dp), onDismissRequest = {
+    ModalBottomSheet(modifier = modifier,
+        sheetState = rememberModalBottomSheetState(true),
+        onDismissRequest = {
         onDismiss()
     }) {
         Column(
-            modifier = Modifier,
-            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             CenteredTextField(
