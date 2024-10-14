@@ -26,7 +26,7 @@ struct ContentView: View {
     var body: some View {
         ComposeView()
             .padding(.bottom, -40)
-            .padding(.top, -60)
+           // .padding(.top, -60)
             .ignoresSafeArea(.keyboard) // Compose has own keyboard handler
     }
 }

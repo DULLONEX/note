@@ -3,6 +3,7 @@ package ui.screen.chargeUp
 
 import NavCompose
 import Platform
+import SelectImageCompose
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -27,7 +28,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
@@ -36,6 +36,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -64,6 +65,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import config.Route
+import config.SwitchImageStatus
 import config.convertLocalDateTime
 import config.formatToString
 import config.getCurrentDateTime
@@ -72,6 +75,7 @@ import config.toLong
 import config.withHourAndMinute
 import data.entiry.AmountTypeDto
 import data.entiry.FileData
+import data.entiry.asBitmapList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
@@ -85,13 +89,13 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import ui.AlterSnackbar
-import ui.AnimationTextShow
 import ui.CenteredTextField
 import ui.LoadCompose
 import ui.PictureViewer
 import ui.TextInputCompose
 import ui.screen.remind.DateDayChooseItem
 import ui.theme.TransparentOutlinedTextFieldColors
+import ui.viewmodel.FileViewModel
 import ui.viewmodel.SaveChargeUpViewModel
 
 class AddChargeUpCompose : KoinComponent {
@@ -102,12 +106,16 @@ class AddChargeUpCompose : KoinComponent {
     fun AddChargeUpScreen(
         modifier: Modifier = Modifier,
         navController: NavHostController = platform.navController,
-        viewModel: SaveChargeUpViewModel = viewModel { SaveChargeUpViewModel() },
+        saveChargeUpViewModel: SaveChargeUpViewModel = viewModel { SaveChargeUpViewModel() },
+        fileViewModel: FileViewModel = viewModel(),
         id: Long? = null
     ) {
+        val fileStatus by fileViewModel.file.collectAsState()
+
+
         val scope = rememberCoroutineScope()
         val snackarHostState = remember { SnackbarHostState() }
-        val errorInfo by viewModel.errorInfo.collectAsState()
+        val errorInfo by saveChargeUpViewModel.errorInfo.collectAsState()
 
         // 加载数据后控制 UI 显示的状态
         var isReadyToShowUI by remember { mutableStateOf(false) }
@@ -119,14 +127,19 @@ class AddChargeUpCompose : KoinComponent {
                 snackarHostState.showSnackbar(stringResource)
             }
         }
-
         LaunchedEffect(id) {
-            if (id != null) {
-                viewModel.loadChargeUpById(id)
+            if (id != null && saveChargeUpViewModel.chargeUpStatus.value.id != id) {
+                saveChargeUpViewModel.loadChargeUpById(id)
                 delay(200)  // 延迟 200 毫秒
 
             }
             isReadyToShowUI = true  // 只有在延迟后设置状态为 true
+        }
+        LaunchedEffect(fileStatus) {
+            if (fileStatus.isNotEmpty()) {
+                saveChargeUpViewModel.addFile(fileStatus)
+                fileViewModel.clearFileList()
+            }
         }
 
         // 如果 UI 准备好才显示界面
@@ -136,7 +149,7 @@ class AddChargeUpCompose : KoinComponent {
             topBar = {
                 navCompose.TopAppBarCompose(Modifier.padding(end = 16.dp), onActionClick = {
                     scope.launch {
-                        if (viewModel.save()) {
+                        if (saveChargeUpViewModel.save()) {
                             navController.navigateUp()
                         }
                     }
@@ -156,10 +169,11 @@ class AddChargeUpCompose : KoinComponent {
     @Composable
     fun ChargeUpCompose(
         modifier: Modifier = Modifier,
-        viewModel: SaveChargeUpViewModel = viewModel { SaveChargeUpViewModel() },
+        saveChargeUpViewModel: SaveChargeUpViewModel = viewModel { SaveChargeUpViewModel() },
+        navController: NavHostController = platform.navController
     ) {
-        val chargeUpStatus by viewModel.chargeUpStatus.collectAsState()
-        val amountTypeList by viewModel.amountTypeList.collectAsState()
+        val chargeUpStatus by saveChargeUpViewModel.chargeUpStatus.collectAsState()
+        val amountTypeList by saveChargeUpViewModel.amountTypeList.collectAsState()
 
         Column(
             modifier
@@ -167,51 +181,107 @@ class AddChargeUpCompose : KoinComponent {
             HeadCompose(
                 modifier = Modifier,
                 textValue = chargeUpStatus.content,
-                textOnChange = viewModel::contentChange,
+                textOnChange = saveChargeUpViewModel::contentChange,
                 amountValue = chargeUpStatus.amount,
-                amountOnChange = viewModel::amountChange,
+                amountOnChange = saveChargeUpViewModel::amountChange,
                 selectedDate = chargeUpStatus.fillTime,
-                onDateChange = viewModel::fillTimeChange
+                onDateChange = saveChargeUpViewModel::fillTimeChange
             )
             //类型
             AmountTypeCompose(
                 Modifier.padding(horizontal = 8.dp),
                 amountTypeList = amountTypeList,
-                addAmountType = viewModel::saveAmountType,
-                updateAmountType = viewModel::updateAmountType,
+                addAmountType = saveChargeUpViewModel::saveAmountType,
+                updateAmountType = saveChargeUpViewModel::updateAmountType,
                 selected = chargeUpStatus.amountType,
-                selectOnChange = viewModel::amountTypeSelect
+                selectOnChange = saveChargeUpViewModel::amountTypeSelect
             )
             //选择图片
+            AddImageCompose(
+                Modifier,
+                imageBitmapArray = chargeUpStatus.files.asBitmapList(),
+                addPhoto = { saveChargeUpViewModel.addFile(FileData(null, it)) },
+                delPhoto = { image -> saveChargeUpViewModel.delFile(image) },
+                goCamera = {
+                    navController.navigate(Route.CAMERA.route) {
+                        popUpTo(Route.CAMERA.route) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
+            )
+            /**
             platform.SelectImageCompose(fileDataList = chargeUpStatus.files,
-                addFile = { viewModel.addFile(FileData(null, it)) },
-                delFile = { image -> viewModel.delFile(image) },
-                content = { imageBitmapArray, addPhoto, delImageChange ->
-                    SelectedFileImageCompose(
-                        Modifier.padding(horizontal = 8.dp),
-                        imageBitmapArray = imageBitmapArray,
-                        addPhoto = addPhoto,
-                        delImageChange = delImageChange
-                    )
-                })
+            addFile = { saveChargeUpViewModel.addFile(FileData(null, it)) },
+            delFile = { image -> saveChargeUpViewModel.delFile(image) },
+            content = { imageBitmapArray, addSelectPhoto, delImageChange ->
+            SelectedFileImageCompose(
+            Modifier.padding(horizontal = 8.dp),
+            imageBitmapArray = imageBitmapArray,
+            addSelectPhoto = addSelectPhoto,
+            delImageChange = delImageChange
+            )
+            })
+
+             */
         }
     }
 
 }
 
+// 添加图片compose
+@Composable
+fun AddImageCompose(
+    modifier: Modifier = Modifier,
+    imageBitmapArray: List<ImageBitmap>,
+    addPhoto: (ImageBitmap) -> Unit,
+    delPhoto: (ImageBitmap) -> Unit,
+    goCamera: () -> Unit = {}
+) {
 
+    var status by remember { mutableStateOf(SwitchImageStatus.SHOW) }
+    SelectedFileImageCompose(modifier = modifier,
+        imageBitmapArray = imageBitmapArray,
+        delImageChange = delPhoto,
+        switchStatusChange = {
+            status = it
+        })
+    when (status) {
+        SwitchImageStatus.SHOW -> {
+
+        }
+
+        SwitchImageStatus.SELECT -> {
+            SelectImageCompose(modifier = Modifier, addFile = {
+                addPhoto(it)
+                status = SwitchImageStatus.SHOW
+            })
+        }
+
+        SwitchImageStatus.CAMERA -> {
+            goCamera()
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectedFileImageCompose(
     modifier: Modifier = Modifier,
     imageBitmapArray: List<ImageBitmap>,
-    addPhoto: () -> Unit,
-    delImageChange: (ImageBitmap) -> Unit
+    delImageChange: (ImageBitmap) -> Unit,
+    switchStatusChange: (SwitchImageStatus) -> Unit = {}
 ) {
     var selectedImage by remember { mutableStateOf<ImageBitmap?>(null) }
+    var showSheet by remember { mutableStateOf(false) }
     Column(modifier.fillMaxWidth()) {
-        Button({ addPhoto() }) {
+        Button({
+            showSheet = !showSheet
+        }) {
             Text(stringResource(Res.string.add_image))
         }
+
+        // 暂时选择的图片
         LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             items(imageBitmapArray) {
                 Box(Modifier.size(135.dp, 240.dp)) {
@@ -235,6 +305,30 @@ fun SelectedFileImageCompose(
 
     if (selectedImage != null) {
         PictureViewer(onDismissRequest = { selectedImage = null }, bitmap = selectedImage!!)
+    }
+    if (showSheet) {
+        ModalBottomSheet(
+            modifier = Modifier.fillMaxHeight(0.3f),
+            onDismissRequest = { showSheet = !showSheet }) {
+            Column(
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedButton({
+                    showSheet = !showSheet
+                    switchStatusChange(SwitchImageStatus.CAMERA)
+                }) {
+                    Text("拍照")
+                }
+                OutlinedButton({
+                    showSheet = !showSheet
+                    switchStatusChange(SwitchImageStatus.SELECT)
+                }) {
+                    Text("相册")
+                }
+            }
+        }
     }
 
 }
@@ -316,8 +410,7 @@ fun AmountTypeAddItem(
     }, selected = false
     )
     if (showSheet) {
-        AmountTypeBottomSheet(
-            modifier = Modifier,
+        AmountTypeBottomSheet(modifier = Modifier,
             onDone = addAmountType,
             onDismiss = { showSheet = !showSheet })
     }
@@ -332,11 +425,12 @@ fun AmountTypeBottomSheet(
     amountType: AmountTypeDto = AmountTypeDto(0, "", false)
 ) {
     var text by remember { mutableStateOf(amountType.message) }
-    ModalBottomSheet(modifier = modifier,
+    ModalBottomSheet(
+        modifier = modifier,
         sheetState = rememberModalBottomSheetState(true),
         onDismissRequest = {
-        onDismiss()
-    }) {
+            onDismiss()
+        }) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Top,
@@ -414,9 +508,11 @@ fun HeadCompose(
     Column(modifier.fillMaxWidth()) {
         // 用于填写消费日期
         Text(
-            text = selectedDate.formatToString(), modifier = Modifier.padding(start = 4.dp).clickable {
+            text = selectedDate.formatToString(),
+            modifier = Modifier.padding(start = 4.dp).clickable {
                 dateSelect = !dateSelect
-            }, style = MaterialTheme.typography.bodyLarge.copy(fontSize = 32.sp)
+            },
+            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 32.sp)
         )
         HorizontalDivider()
 

@@ -1,8 +1,7 @@
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.navigation.NavHostController
@@ -16,7 +15,6 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.get
 import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.refTo
 import kotlinx.cinterop.reinterpret
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.Dispatchers
@@ -27,9 +25,11 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.skia.Image
+import platform.AVFoundation.AVCaptureDevice
+import platform.AVFoundation.AVMediaTypeVideo
+import platform.AVFoundation.requestAccessForMediaType
 import platform.CoreGraphics.CGBitmapContextCreate
 import platform.CoreGraphics.CGBitmapContextCreateImage
-import platform.CoreGraphics.CGBitmapInfo
 import platform.CoreGraphics.CGColorSpaceCreateDeviceRGB
 import platform.CoreGraphics.CGImageAlphaInfo
 import platform.EventKit.EKAlarm
@@ -44,7 +44,6 @@ import platform.Foundation.NSCalendarUnitWeekOfYear
 import platform.Foundation.NSData
 import platform.Foundation.NSDate
 import platform.Foundation.NSDateComponents
-import platform.Foundation.NSDecimal
 import platform.Foundation.NSDecimalNumber
 import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
@@ -52,7 +51,6 @@ import platform.Foundation.NSLocale
 import platform.Foundation.NSURL
 import platform.Foundation.NSUUID
 import platform.Foundation.URLByAppendingPathComponent
-import platform.Foundation.addObserver
 import platform.Foundation.currentLocale
 import platform.Foundation.dataWithContentsOfFile
 import platform.Foundation.languageCode
@@ -63,11 +61,11 @@ import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
 import platform.UIKit.UIImagePickerController
 import platform.UIKit.UIImagePickerControllerDelegateProtocol
-import platform.UIKit.UIImagePickerControllerEditedImage
 import platform.UIKit.UIImagePickerControllerOriginalImage
 import platform.UIKit.UIImagePickerControllerSourceType
 import platform.UIKit.UINavigationControllerDelegateProtocol
 import platform.darwin.NSObject
+import ui.viewmodel.FileViewModel
 
 @OptIn(ExperimentalForeignApi::class)
 fun ImageBitmap.toUIImage(): UIImage {
@@ -145,6 +143,15 @@ fun requestCalendarAccess(completion: (granted: Boolean, error: NSError?) -> Uni
 
     eventStore.requestAccessToEntityType(EKEntityType.EKEntityTypeEvent) { granted, error ->
         completion(granted, error)
+    }
+
+    AVCaptureDevice.requestAccessForMediaType(AVMediaTypeVideo) { granted ->
+        if (granted) {
+            completion(true, null)
+        } else {
+            val error = NSError.errorWithDomain("CameraAccess", -1, null)
+            completion(false, error)
+        }
     }
 }
 
@@ -238,11 +245,6 @@ class iOSPlatform(private val vc: NavHostController) : Platform {
         ) -> Unit
     ) {
         val imagePicker = UIImagePickerController()
-
-        // 使用 snapshotFlow 来监听 fileDataList 的变化
-        val imageBitmapListState by snapshotFlow { fileDataList.mapNotNull { it?.imageBitmap } }
-            .collectAsState(initial = emptyList())
-
         // 图片选择窗口的委托
         val galleryDelegate = remember {
             object : NSObject(), UIImagePickerControllerDelegateProtocol,
@@ -251,7 +253,8 @@ class iOSPlatform(private val vc: NavHostController) : Platform {
                     picker: UIImagePickerController, didFinishPickingMediaWithInfo: Map<Any?, *>
                 ) {
                     // 确保只获取原始图片
-                    val image = didFinishPickingMediaWithInfo[UIImagePickerControllerOriginalImage] as? UIImage
+                    val image =
+                        didFinishPickingMediaWithInfo[UIImagePickerControllerOriginalImage] as? UIImage
 
                     // 将图片转换为字节数组
                     val byteArray: ByteArray? = image?.let {
@@ -276,17 +279,18 @@ class iOSPlatform(private val vc: NavHostController) : Platform {
         }
 
         // 配置 UIImagePickerController
-        imagePicker.sourceType = UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypePhotoLibrary
+        imagePicker.sourceType =
+            UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypePhotoLibrary
         imagePicker.allowsEditing = false // 禁用编辑以确保获取原图
         imagePicker.setDelegate(galleryDelegate)
 
-        // 使用传入的 content Composable 来处理界面展示
-        content(imageBitmapListState, {
-            // 打开图片选择器
+        LaunchedEffect(Unit) {
             UIApplication.sharedApplication.keyWindow?.rootViewController?.presentViewController(
                 imagePicker, true, null
             )
-        }, { delFile(it) })
+        }
+
+
     }
 
     override fun saveFileImage(imageBitmap: ImageBitmap): String {
@@ -321,9 +325,90 @@ class iOSPlatform(private val vc: NavHostController) : Platform {
                 Image.makeFromEncoded(it).toComposeImageBitmap()
             }
         }
-
     }
 }
+
+@OptIn(ExperimentalForeignApi::class)
+fun NSData.toImageBitmap(): ImageBitmap {
+    val nsData = this
+    val uiImage = UIImage(nsData)
+    // 转换为 ImageBitmap
+    return uiImage.let {
+        val imageData = UIImageJPEGRepresentation(it, 0.99)
+        val bytes = imageData?.bytes?.reinterpret<ByteVar>()
+        val length = imageData?.length?.toInt() ?: 0
+        ByteArray(length) { index -> bytes!![index] }
+    }.let {
+        Image.makeFromEncoded(it).toComposeImageBitmap()
+    }
+}
+
+
+@OptIn(ExperimentalForeignApi::class)
+@Composable
+actual fun SelectImageCompose(
+    modifier: Modifier,
+    addFile: (ImageBitmap) -> Unit,
+) {
+    val imagePicker = UIImagePickerController()
+    // 图片选择窗口的委托
+    val galleryDelegate = remember {
+        object : NSObject(), UIImagePickerControllerDelegateProtocol,
+            UINavigationControllerDelegateProtocol {
+            override fun imagePickerController(
+                picker: UIImagePickerController, didFinishPickingMediaWithInfo: Map<Any?, *>
+            ) {
+                // 确保只获取原始图片
+                val image =
+                    didFinishPickingMediaWithInfo[UIImagePickerControllerOriginalImage] as? UIImage
+
+                // 将图片转换为字节数组
+                val byteArray: ByteArray? = image?.let {
+                    val imageData = UIImageJPEGRepresentation(it, 0.99) // 高质量压缩
+                    val bytes = imageData?.bytes?.reinterpret<ByteVar>()
+                    val length = imageData?.length?.toInt() ?: 0
+                    ByteArray(length) { index -> bytes!![index] }
+                }
+
+                // 将字节数组转换为 ImageBitmap
+                val img = byteArray?.let {
+                    Image.makeFromEncoded(it).toComposeImageBitmap()
+                }
+
+                // 添加文件到列表
+                img?.let { addFile(it) }
+
+                // 关闭图片选择器
+                picker.dismissViewControllerAnimated(true, null)
+            }
+        }
+    }
+
+    // 配置 UIImagePickerController
+    imagePicker.sourceType =
+        UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypePhotoLibrary
+    imagePicker.allowsEditing = false // 禁用编辑以确保获取原图
+    imagePicker.setDelegate(galleryDelegate)
+
+    LaunchedEffect(Unit) {
+        UIApplication.sharedApplication.keyWindow?.rootViewController?.presentViewController(
+            imagePicker, true, null
+        )
+    }
+
+}
+
+@Composable
+actual fun CameraShoot(
+    modifier: Modifier,
+    back: () -> Unit,
+    fileViewModel: FileViewModel,
+) {
+    CameraScreen(Modifier, back = back, fileViewModel)
+
+
+}
+
 
 actual fun isSameWeek(
     year1: Int, month1: Int, day1: Int, year2: Int, month2: Int, day2: Int

@@ -14,6 +14,7 @@ import org.onex.note.R
 val accreditList = listOf(
     Manifest.permission.WRITE_CALENDAR,
     Manifest.permission.READ_CALENDAR,
+    Manifest.permission.CAMERA,
 )
 
 

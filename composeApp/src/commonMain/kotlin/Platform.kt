@@ -1,9 +1,11 @@
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.navigation.NavHostController
 import data.entiry.EventRemind
 import data.entiry.FileData
 import data.entiry.RemindDto
+import ui.viewmodel.FileViewModel
 
 interface Platform {
     // 路由导航
@@ -30,6 +32,19 @@ interface Platform {
 
     suspend fun downFileImage(filePath:String):ImageBitmap?
 }
+
+@Composable
+expect fun SelectImageCompose(
+    modifier: Modifier = Modifier,
+    addFile:(ImageBitmap)->Unit,
+);
+
+@Composable
+expect fun CameraShoot(
+    modifier: Modifier = Modifier,
+    back: () -> Unit,
+    fileViewModel: FileViewModel,
+);
 
 /**
  * 判断是否同一周

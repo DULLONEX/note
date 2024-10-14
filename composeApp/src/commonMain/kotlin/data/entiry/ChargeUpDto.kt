@@ -1,5 +1,6 @@
 package data.entiry
 
+import androidx.compose.ui.graphics.ImageBitmap
 import com.onex.note.ChargeUp
 import com.onex.note.SelectAllChargeUp
 import com.onex.note.SelectChargeUpByid
@@ -36,6 +37,11 @@ data class MonthSumCharge(
     var currentDate: String = "",
 
 )
+
+fun  MutableList<FileData>.asBitmapList(): List<ImageBitmap> {
+   return this.filter { it.imageBitmap != null }.map { it.imageBitmap!! }.toList()
+}
+
 
 fun SelectAllChargeUp.toChargeUpDto(): ChargeUpDto {
 

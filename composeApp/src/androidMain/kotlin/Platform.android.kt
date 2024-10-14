@@ -11,17 +11,21 @@ import android.provider.CalendarContract
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import config.getTodayZero
 import config.toLocalDateTime
@@ -31,8 +35,11 @@ import data.entiry.FileData
 import data.entiry.RemindDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.onex.note.CameraScreen
 import org.onex.note.accredit.checkAccreditPermission
 import org.onex.note.accredit.getCalendarId
+import ui.screen.chargeUp.SelectedFileImageCompose
+import ui.viewmodel.FileViewModel
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -260,6 +267,42 @@ class AndroidPlatform(private val vc: NavHostController, private val context: Co
             return@withContext bitmap?.asImageBitmap()
         }
     }
+
+}
+
+@Composable
+actual fun SelectImageCompose(
+    modifier: Modifier,
+    addFile: (ImageBitmap) -> Unit,
+) {
+
+
+    val context = LocalContext.current
+
+    // Launcher for selecting image
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            // Convert Uri to ImageBitmap
+            val inputStream = context.contentResolver.openInputStream(uri)
+            val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
+            addFile(bitmap.asImageBitmap())
+        }
+    }
+    LaunchedEffect(Unit) {
+        launcher.launch("image/*")
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.R)
+@Composable
+actual fun CameraShoot(
+    modifier: Modifier,
+    back: () -> Unit,
+    fileViewModel: FileViewModel
+) {
+    CameraScreen(modifier = modifier, back = back, fileViewModel = fileViewModel)
 
 }
 

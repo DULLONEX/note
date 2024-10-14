@@ -27,6 +27,132 @@
 			<key>type</key>
 			<string>bookmark</string>
 		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>186</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>185</string>
+					<key>Timestamp</key>
+					<string>750403992.729341</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>home-directory</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>AndroidStudioProjects/Note/composeApp/src/commonMain/kotlin/ui/screen/chargeUp/AddChargeUpScreen.kt</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string></string>
+				<key>leading</key>
+				<string>            //选择图片
+            platform.SelectImageCompose(fileDataList = chargeUpStatus.files,
+</string>
+				<key>trailing</key>
+				<string>                addFile = { viewModel.addFile(FileData(null, it)) },
+                delFile = { image -&gt; viewModel.delFile(image) },
+                content = { imageBitmapArray, addSelectPhoto, delImageChange -&gt;
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>home-directory</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>AndroidStudioProjects/Note/composeApp/src/commonMain/kotlin/ui/screen/chargeUp/AddChargeUpScreen.kt</string>
+					</dict>
+				</dict>
+				<key>type</key>
+				<string>DVTDocumentLocation</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>186</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>185</string>
+					<key>Timestamp</key>
+					<string>750403992.729305</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>home-directory</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>AndroidStudioProjects/Note/composeApp/src/commonMain/kotlin/ui/screen/chargeUp/AddChargeUpScreen.kt</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string></string>
+				<key>leading</key>
+				<string>            //选择图片
+            platform.SelectImageCompose(fileDataList = chargeUpStatus.files,
+</string>
+				<key>trailing</key>
+				<string>                addFile = { viewModel.addFile(FileData(null, it)) },
+                delFile = { image -&gt; viewModel.delFile(image) },
+                content = { imageBitmapArray, addSelectPhoto, delImageChange -&gt;
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>home-directory</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>AndroidStudioProjects/Note/composeApp/src/commonMain/kotlin/ui/screen/chargeUp/AddChargeUpScreen.kt</string>
+					</dict>
+				</dict>
+				<key>type</key>
+				<string>DVTDocumentLocation</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
 	</array>
 </dict>
 </plist>

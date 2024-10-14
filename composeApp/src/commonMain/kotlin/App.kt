@@ -1,12 +1,8 @@
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -31,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -41,7 +38,6 @@ import config.Route
 import config.returnLabelIcon
 import data.service.RemindService
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.close
@@ -55,6 +51,7 @@ import ui.screen.chargeUp.ChargeUpCompose
 import ui.screen.remind.AddRemindScreenCompose
 import ui.screen.remind.RemindScreen
 import ui.theme.AppTheme
+import ui.viewmodel.FileViewModel
 
 
 @Composable
@@ -62,11 +59,8 @@ import ui.theme.AppTheme
 fun App() {
     AppTheme {
         val navCompose = NavCompose()
-        Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-            navCompose.BottomNavigationBar()
-        }) { innerPadding ->
-            navCompose.MainNav(innerPadding = innerPadding)
-        }
+
+        navCompose.MainNav()
     }
 }
 
@@ -78,8 +72,9 @@ class NavCompose : KoinComponent {
 
     @Composable
     fun MainNav(
-        navController: NavHostController = platform.navController, innerPadding: PaddingValues
+        navController: NavHostController = platform.navController,
     ) {
+        val fileViewModel: FileViewModel = viewModel{ FileViewModel() }
         val addRemindScreenCompose = AddRemindScreenCompose()
         val addChargeUpCompose = AddChargeUpCompose()
         val chargeUpCompose = ChargeUpCompose()
@@ -99,30 +94,69 @@ class NavCompose : KoinComponent {
         }
         NavHost(navController = navController,
             startDestination = Route.REMIND.route,
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
-                .padding(innerPadding),
+            modifier = Modifier.fillMaxSize(),
             enterTransition = { fadeIn(animationSpec = tween(0)) },
             exitTransition = { fadeOut(animationSpec = tween(0)) }) {
 
 
             composable(route = Route.REMIND.route) {
-                RemindScreen(modifier = Modifier.size(100.dp))
+                Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
+                    BottomNavigationBar()
+                }) { innerPadding ->
+                    RemindScreen(
+                        modifier = Modifier.fillMaxSize().padding(innerPadding)
+                    )
+                }
             }
             composable(route = Route.CHARGE_UP.route) {
-                chargeUpCompose.ChargeUpScreen(modifier = Modifier.size(100.dp))
+                Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
+                    BottomNavigationBar()
+                }) { innerPadding ->
+                    chargeUpCompose.ChargeUpScreen(
+                        modifier = Modifier.fillMaxSize().padding(innerPadding)
+                    )
+                }
             }
             composable(route = Route.REMIND_ADD.route) {
-                addRemindScreenCompose.AddRemindScreen(modifier = Modifier.size(100.dp))
+                Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
+                    BottomNavigationBar()
+                }) { innerPadding ->
+                    addRemindScreenCompose.AddRemindScreen(
+                        modifier = Modifier.fillMaxSize().padding(innerPadding)
+                    )
+                }
             }
             composable(route = Route.CHARGE_UP_ADD.route) {
-                addChargeUpCompose.AddChargeUpScreen(modifier = Modifier.size(100.dp))
+                Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
+                    BottomNavigationBar()
+                }) { innerPadding ->
+                    addChargeUpCompose.AddChargeUpScreen(
+                        modifier = Modifier.fillMaxSize().padding(innerPadding),
+                        fileViewModel = fileViewModel
+                    )
+                }
             }
             composable(
                 route = "${Route.CHARGE_UP_DETAIL.route}/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.LongType })
             ) { backStackEntry ->
+
                 val id: Long? = backStackEntry.arguments?.getLong("id")
-                addChargeUpCompose.AddChargeUpScreen(modifier = Modifier.size(100.dp), id = id)
+                Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
+                    BottomNavigationBar()
+                }) { innerPadding ->
+                    addChargeUpCompose.AddChargeUpScreen(
+                        modifier = Modifier.fillMaxSize().padding(innerPadding),
+                        id = id,
+                        fileViewModel = fileViewModel
+                    )
+                }
+            }
+            composable(Route.CAMERA.route) {
+                // 在这个页面进行拍摄
+                CameraShoot(Modifier, {
+                    navController.navigateUp()
+                }, fileViewModel)
             }
         }
     }

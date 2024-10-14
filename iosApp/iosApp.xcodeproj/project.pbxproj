@@ -10,6 +10,10 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
+		4B4020082CBA421C007F6988 /* IOSDatabaseDriverFactory.kt in Resources */ = {isa = PBXBuildFile; fileRef = 4B4020002CBA421C007F6988 /* IOSDatabaseDriverFactory.kt */; };
+		4B4020092CBA421C007F6988 /* appModule.kt in Resources */ = {isa = PBXBuildFile; fileRef = 4B4020022CBA421C007F6988 /* appModule.kt */; };
+		4B40200A2CBA421C007F6988 /* MainViewController.kt in Resources */ = {isa = PBXBuildFile; fileRef = 4B4020042CBA421C007F6988 /* MainViewController.kt */; };
+		4B40200B2CBA421C007F6988 /* Platform.ios.kt in Resources */ = {isa = PBXBuildFile; fileRef = 4B4020052CBA421C007F6988 /* Platform.ios.kt */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
@@ -17,6 +21,39 @@
 		058557BA273AAA24004C7B11 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
+		4B401FD82CBA2165007F6988 /* CheckUtil.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CheckUtil.kt; sourceTree = "<group>"; };
+		4B401FD92CBA2165007F6988 /* DateUtil.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = DateUtil.kt; sourceTree = "<group>"; };
+		4B401FDA2CBA2165007F6988 /* LabelConfig.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LabelConfig.kt; sourceTree = "<group>"; };
+		4B401FDB2CBA2165007F6988 /* StateInfo.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = StateInfo.kt; sourceTree = "<group>"; };
+		4B401FDC2CBA2165007F6988 /* StringResource.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = StringResource.kt; sourceTree = "<group>"; };
+		4B401FDE2CBA2165007F6988 /* AmountTypeDto.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = AmountTypeDto.kt; sourceTree = "<group>"; };
+		4B401FDF2CBA2165007F6988 /* ChargeUpDto.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ChargeUpDto.kt; sourceTree = "<group>"; };
+		4B401FE02CBA2165007F6988 /* FileData.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = FileData.kt; sourceTree = "<group>"; };
+		4B401FE12CBA2165007F6988 /* RemindDto.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = RemindDto.kt; sourceTree = "<group>"; };
+		4B401FE32CBA2165007F6988 /* AmountTypeService.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = AmountTypeService.kt; sourceTree = "<group>"; };
+		4B401FE42CBA2165007F6988 /* ChargeUpService.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ChargeUpService.kt; sourceTree = "<group>"; };
+		4B401FE52CBA2165007F6988 /* RemindService.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = RemindService.kt; sourceTree = "<group>"; };
+		4B401FE72CBA2165007F6988 /* Database.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Database.kt; sourceTree = "<group>"; };
+		4B401FE82CBA2165007F6988 /* DatabaseDriverFactory.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = DatabaseDriverFactory.kt; sourceTree = "<group>"; };
+		4B401FEA2CBA2165007F6988 /* AddChargeUpScreen.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = AddChargeUpScreen.kt; sourceTree = "<group>"; };
+		4B401FEB2CBA2165007F6988 /* ChargeUpScreen.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ChargeUpScreen.kt; sourceTree = "<group>"; };
+		4B401FED2CBA2165007F6988 /* AddRemindScreen.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = AddRemindScreen.kt; sourceTree = "<group>"; };
+		4B401FEE2CBA2165007F6988 /* RemindScreen.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = RemindScreen.kt; sourceTree = "<group>"; };
+		4B401FF12CBA2165007F6988 /* Color.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Color.kt; sourceTree = "<group>"; };
+		4B401FF22CBA2165007F6988 /* Theme.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Theme.kt; sourceTree = "<group>"; };
+		4B401FF32CBA2165007F6988 /* Type.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Type.kt; sourceTree = "<group>"; };
+		4B401FF52CBA2165007F6988 /* ChargeUpViewModel.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ChargeUpViewModel.kt; sourceTree = "<group>"; };
+		4B401FF62CBA2165007F6988 /* NavViewModel.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = NavViewModel.kt; sourceTree = "<group>"; };
+		4B401FF72CBA2165007F6988 /* RemindViewModel.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = RemindViewModel.kt; sourceTree = "<group>"; };
+		4B401FF82CBA2165007F6988 /* SaveChargeUpViewModel.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = SaveChargeUpViewModel.kt; sourceTree = "<group>"; };
+		4B401FF92CBA2165007F6988 /* SaveRemindViewModel.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = SaveRemindViewModel.kt; sourceTree = "<group>"; };
+		4B401FFB2CBA2165007F6988 /* CommonCompose.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CommonCompose.kt; sourceTree = "<group>"; };
+		4B401FFD2CBA2165007F6988 /* App.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = App.kt; sourceTree = "<group>"; };
+		4B401FFE2CBA2165007F6988 /* Platform.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Platform.kt; sourceTree = "<group>"; };
+		4B4020002CBA421C007F6988 /* IOSDatabaseDriverFactory.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = IOSDatabaseDriverFactory.kt; sourceTree = "<group>"; };
+		4B4020022CBA421C007F6988 /* appModule.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = appModule.kt; sourceTree = "<group>"; };
+		4B4020042CBA421C007F6988 /* MainViewController.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = MainViewController.kt; sourceTree = "<group>"; };
+		4B4020052CBA421C007F6988 /* Platform.ios.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Platform.ios.kt; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* Note.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Note.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -49,6 +86,168 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		4B401FDD2CBA2165007F6988 /* config */ = {
+			isa = PBXGroup;
+			children = (
+				4B401FD82CBA2165007F6988 /* CheckUtil.kt */,
+				4B401FD92CBA2165007F6988 /* DateUtil.kt */,
+				4B401FDA2CBA2165007F6988 /* LabelConfig.kt */,
+				4B401FDB2CBA2165007F6988 /* StateInfo.kt */,
+				4B401FDC2CBA2165007F6988 /* StringResource.kt */,
+			);
+			path = config;
+			sourceTree = "<group>";
+		};
+		4B401FE22CBA2165007F6988 /* entiry */ = {
+			isa = PBXGroup;
+			children = (
+				4B401FDE2CBA2165007F6988 /* AmountTypeDto.kt */,
+				4B401FDF2CBA2165007F6988 /* ChargeUpDto.kt */,
+				4B401FE02CBA2165007F6988 /* FileData.kt */,
+				4B401FE12CBA2165007F6988 /* RemindDto.kt */,
+			);
+			path = entiry;
+			sourceTree = "<group>";
+		};
+		4B401FE62CBA2165007F6988 /* service */ = {
+			isa = PBXGroup;
+			children = (
+				4B401FE32CBA2165007F6988 /* AmountTypeService.kt */,
+				4B401FE42CBA2165007F6988 /* ChargeUpService.kt */,
+				4B401FE52CBA2165007F6988 /* RemindService.kt */,
+			);
+			path = service;
+			sourceTree = "<group>";
+		};
+		4B401FE92CBA2165007F6988 /* data */ = {
+			isa = PBXGroup;
+			children = (
+				4B401FE22CBA2165007F6988 /* entiry */,
+				4B401FE62CBA2165007F6988 /* service */,
+				4B401FE72CBA2165007F6988 /* Database.kt */,
+				4B401FE82CBA2165007F6988 /* DatabaseDriverFactory.kt */,
+			);
+			path = data;
+			sourceTree = "<group>";
+		};
+		4B401FEC2CBA2165007F6988 /* chargeUp */ = {
+			isa = PBXGroup;
+			children = (
+				4B401FEA2CBA2165007F6988 /* AddChargeUpScreen.kt */,
+				4B401FEB2CBA2165007F6988 /* ChargeUpScreen.kt */,
+			);
+			path = chargeUp;
+			sourceTree = "<group>";
+		};
+		4B401FEF2CBA2165007F6988 /* remind */ = {
+			isa = PBXGroup;
+			children = (
+				4B401FED2CBA2165007F6988 /* AddRemindScreen.kt */,
+				4B401FEE2CBA2165007F6988 /* RemindScreen.kt */,
+			);
+			path = remind;
+			sourceTree = "<group>";
+		};
+		4B401FF02CBA2165007F6988 /* screen */ = {
+			isa = PBXGroup;
+			children = (
+				4B401FEC2CBA2165007F6988 /* chargeUp */,
+				4B401FEF2CBA2165007F6988 /* remind */,
+			);
+			path = screen;
+			sourceTree = "<group>";
+		};
+		4B401FF42CBA2165007F6988 /* theme */ = {
+			isa = PBXGroup;
+			children = (
+				4B401FF12CBA2165007F6988 /* Color.kt */,
+				4B401FF22CBA2165007F6988 /* Theme.kt */,
+				4B401FF32CBA2165007F6988 /* Type.kt */,
+			);
+			path = theme;
+			sourceTree = "<group>";
+		};
+		4B401FFA2CBA2165007F6988 /* viewmodel */ = {
+			isa = PBXGroup;
+			children = (
+				4B401FF52CBA2165007F6988 /* ChargeUpViewModel.kt */,
+				4B401FF62CBA2165007F6988 /* NavViewModel.kt */,
+				4B401FF72CBA2165007F6988 /* RemindViewModel.kt */,
+				4B401FF82CBA2165007F6988 /* SaveChargeUpViewModel.kt */,
+				4B401FF92CBA2165007F6988 /* SaveRemindViewModel.kt */,
+			);
+			path = viewmodel;
+			sourceTree = "<group>";
+		};
+		4B401FFC2CBA2165007F6988 /* ui */ = {
+			isa = PBXGroup;
+			children = (
+				4B401FF02CBA2165007F6988 /* screen */,
+				4B401FF42CBA2165007F6988 /* theme */,
+				4B401FFA2CBA2165007F6988 /* viewmodel */,
+				4B401FFB2CBA2165007F6988 /* CommonCompose.kt */,
+			);
+			path = ui;
+			sourceTree = "<group>";
+		};
+		4B401FFF2CBA2165007F6988 /* kotlin */ = {
+			isa = PBXGroup;
+			children = (
+				4B401FDD2CBA2165007F6988 /* config */,
+				4B401FE92CBA2165007F6988 /* data */,
+				4B401FFC2CBA2165007F6988 /* ui */,
+				4B401FFD2CBA2165007F6988 /* App.kt */,
+				4B401FFE2CBA2165007F6988 /* Platform.kt */,
+			);
+			name = kotlin;
+			path = ../composeApp/src/commonMain/kotlin;
+			sourceTree = SOURCE_ROOT;
+		};
+		4B4020012CBA421C007F6988 /* data */ = {
+			isa = PBXGroup;
+			children = (
+				4B4020002CBA421C007F6988 /* IOSDatabaseDriverFactory.kt */,
+			);
+			path = data;
+			sourceTree = "<group>";
+		};
+		4B4020032CBA421C007F6988 /* di */ = {
+			isa = PBXGroup;
+			children = (
+				4B4020022CBA421C007F6988 /* appModule.kt */,
+			);
+			path = di;
+			sourceTree = "<group>";
+		};
+		4B4020062CBA421C007F6988 /* kotlin */ = {
+			isa = PBXGroup;
+			children = (
+				4B4020012CBA421C007F6988 /* data */,
+				4B4020032CBA421C007F6988 /* di */,
+				4B4020042CBA421C007F6988 /* MainViewController.kt */,
+				4B4020052CBA421C007F6988 /* Platform.ios.kt */,
+			);
+			path = kotlin;
+			sourceTree = "<group>";
+		};
+		4B4020072CBA421C007F6988 /* iosMain */ = {
+			isa = PBXGroup;
+			children = (
+				4B4020062CBA421C007F6988 /* kotlin */,
+			);
+			name = iosMain;
+			path = ../composeApp/src/iosMain;
+			sourceTree = SOURCE_ROOT;
+		};
+		4B9236282CBA1AB400135C1D /* kotlin-debug */ = {
+			isa = PBXGroup;
+			children = (
+				4B4020072CBA421C007F6988 /* iosMain */,
+				4B401FFF2CBA2165007F6988 /* kotlin */,
+			);
+			path = "kotlin-debug";
+			sourceTree = "<group>";
+		};
 		7555FF72242A565900829871 = {
 			isa = PBXGroup;
 			children = (
@@ -56,6 +255,7 @@
 				7555FF7D242A565900829871 /* iosApp */,
 				7555FF7C242A565900829871 /* Products */,
 				42799AB246E5F90AF97AA0EF /* Frameworks */,
+				4B9236282CBA1AB400135C1D /* kotlin-debug */,
 			);
 			sourceTree = "<group>";
 		};
@@ -152,6 +352,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B4020082CBA421C007F6988 /* IOSDatabaseDriverFactory.kt in Resources */,
+				4B4020092CBA421C007F6988 /* appModule.kt in Resources */,
+				4B40200A2CBA421C007F6988 /* MainViewController.kt in Resources */,
+				4B40200B2CBA421C007F6988 /* Platform.ios.kt in Resources */,
 				058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */,
 				058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */,
 			);

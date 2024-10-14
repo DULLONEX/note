@@ -44,6 +44,17 @@ class SaveChargeUpViewModel : ViewModel(), KoinComponent {
         }
     }
 
+    fun addFile(fileData: List<FileData>) {
+        viewModelScope.launch {
+            // 创建一个新的 List，并添加新的文件
+            val updatedFiles = chargeUpStatus.value.files.toMutableList().apply {
+                addAll(fileData)
+            }
+            // 复制新的 List 并更新状态
+            chargeUpStatus.emit(chargeUpStatus.value.copy(files = updatedFiles))
+        }
+    }
+
     fun addFile(fileData: FileData) {
         viewModelScope.launch {
             // 创建一个新的 List，并添加新的文件

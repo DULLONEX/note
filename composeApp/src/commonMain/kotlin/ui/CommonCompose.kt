@@ -67,6 +67,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -396,7 +397,7 @@ fun PictureViewer(
             contentAlignment = Alignment.Center
         ) {
             Dialog(onDismissRequest = onDismissRequest) {
-                Image(bitmap, "")
+                Image(bitmap, "",contentScale = ContentScale.Crop)
             }
         }
     }

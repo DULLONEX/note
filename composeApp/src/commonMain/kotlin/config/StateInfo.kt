@@ -9,6 +9,7 @@ enum class RemindStatus(val value: Long) {
     NOT_STATE(0),    // 未开始
     ONGOING(1),     // 进行中
     DONE(2);        // 已经完成
+
     companion object {
         // 根据 Long 值查找对应的 enum
         fun fromValue(value: Long): RemindStatus {
@@ -17,6 +18,15 @@ enum class RemindStatus(val value: Long) {
     }
 }
 
-val listTab = mutableListOf(Res.string.not_state,
+val listTab = mutableListOf(
+    Res.string.not_state,
     Res.string.ongoing,
-    Res.string.done,)
+    Res.string.done,
+)
+
+
+enum class SwitchImageStatus(val value: Int) {
+    SHOW(0),     // 展示页面
+    SELECT(1),   // 选择页面
+    CAMERA(2)   //拍摄页面
+}

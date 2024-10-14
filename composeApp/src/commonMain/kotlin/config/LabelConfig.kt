@@ -38,6 +38,7 @@ sealed class Route(val route: String) {
     data object REMIND_ADD : Route("remind_add")
     data object CHARGE_UP_ADD : Route("charge_up_add")
     data object CHARGE_UP_DETAIL : Route("charge_up_detail")
+    data object CAMERA : Route("camera")
 
     companion object {
         fun fromRoute(route: String): Route {
@@ -47,6 +48,7 @@ sealed class Route(val route: String) {
                 REMIND_ADD.route -> REMIND_ADD
                 CHARGE_UP_ADD.route -> CHARGE_UP_ADD
                 CHARGE_UP_DETAIL.route -> CHARGE_UP_DETAIL
+                CAMERA.route -> CAMERA
                 else -> throw IllegalArgumentException("Unknown route: $route")
             }
         }
