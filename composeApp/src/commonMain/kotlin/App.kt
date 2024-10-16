@@ -101,7 +101,7 @@ class NavCompose : KoinComponent {
 
             composable(route = Route.REMIND.route) {
                 Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-                    BottomNavigationBar()
+                    BottomNavigationBar(selected = Route.REMIND)
                 }) { innerPadding ->
                     RemindScreen(
                         modifier = Modifier.fillMaxSize().padding(innerPadding)
@@ -110,7 +110,7 @@ class NavCompose : KoinComponent {
             }
             composable(route = Route.CHARGE_UP.route) {
                 Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-                    BottomNavigationBar()
+                    BottomNavigationBar(selected = Route.CHARGE_UP)
                 }) { innerPadding ->
                     chargeUpCompose.ChargeUpScreen(
                         modifier = Modifier.fillMaxSize().padding(innerPadding)
@@ -119,7 +119,7 @@ class NavCompose : KoinComponent {
             }
             composable(route = Route.REMIND_ADD.route) {
                 Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-                    BottomNavigationBar()
+                    BottomNavigationBar(selected = Route.REMIND)
                 }) { innerPadding ->
                     addRemindScreenCompose.AddRemindScreen(
                         modifier = Modifier.fillMaxSize().padding(innerPadding)
@@ -128,7 +128,7 @@ class NavCompose : KoinComponent {
             }
             composable(route = Route.CHARGE_UP_ADD.route) {
                 Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-                    BottomNavigationBar()
+                    BottomNavigationBar(selected = Route.CHARGE_UP)
                 }) { innerPadding ->
                     addChargeUpCompose.AddChargeUpScreen(
                         modifier = Modifier.fillMaxSize().padding(innerPadding),
@@ -143,7 +143,7 @@ class NavCompose : KoinComponent {
 
                 val id: Long? = backStackEntry.arguments?.getLong("id")
                 Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-                    BottomNavigationBar()
+                    BottomNavigationBar(selected = Route.CHARGE_UP)
                 }) { innerPadding ->
                     addChargeUpCompose.AddChargeUpScreen(
                         modifier = Modifier.fillMaxSize().padding(innerPadding),
@@ -213,29 +213,27 @@ class NavCompose : KoinComponent {
 
     @Composable
     fun BottomNavigationBar(
-        modifier: Modifier = Modifier
+        modifier: Modifier = Modifier,
+        selected:Route = Route.REMIND
     ) {
         val items = returnLabelIcon()
-        NavigationBottomBar(modifier, items)
+        NavigationBottomBar(modifier, items,selected=selected)
     }
 
     @Composable
     fun NavigationBottomBar(
         modifier: Modifier = Modifier,
         items: List<LabelIcon>,
-        navController: NavHostController = platform.navController
+        navController: NavHostController = platform.navController,
+        selected:Route = Route.REMIND
     ) {
-        var selectedItem by rememberSaveable { mutableIntStateOf(0) }
-
         NavigationBar(
             modifier = modifier, tonalElevation = 0.dp
         ) {
-            items.forEachIndexed { index, item ->
-                val isSelected = selectedItem == index
+            items.forEachIndexed { _, item ->
                 NavigationBarItem(icon = {
                     Icon(item.icon, item.showText)
-                }, label = { Text(item.showText) }, selected = isSelected, onClick = {
-                    selectedItem = index
+                }, label = { Text(item.showText) }, selected = item.id == selected.route, onClick = {
                     navController.navigate(item.id)
                 })
             }
