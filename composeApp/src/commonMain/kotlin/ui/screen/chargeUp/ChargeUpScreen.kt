@@ -2,7 +2,14 @@ package ui.screen.chargeUp
 
 import NavCompose
 import Platform
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,6 +30,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,6 +41,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,10 +50,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import config.Route
-import config.formatTimeToString
 import config.formatToString
 import config.getStringResource
 import data.entiry.ChargeUpDto
@@ -61,7 +70,7 @@ import ui.DraggableItem
 import ui.viewmodel.ChargeUpViewModel
 import kotlin.math.roundToInt
 
-class ChargeUpCompose : KoinComponent {
+class ChargeUpComposeScreen : KoinComponent {
     private val platform: Platform by inject()
 
     @Composable
@@ -102,18 +111,53 @@ fun ChargeUpCompose(
     goDetail: (Long) -> Unit = {}
 ) {
     val currentSlippingItem = remember { mutableStateOf<Long?>(null) }
+    var showMap by rememberSaveable(chargeUpMapList) {
+        mutableStateOf(
+            chargeUpMapList.keys.asSequence().map { it.currentDate to true }.toMap()
+        )
+    }
 
     LazyColumn(modifier.padding(horizontal = 4.dp)) {
         chargeUpMapList.forEach { it ->
+
             stickyHeader {
-                StickyHeaderCompose(Modifier, it.key.currentDate, it.key.sumAmount)
+                StickyHeaderCompose(Modifier.zIndex(1f).clickable {
+                    showMap = showMap.toMutableMap().apply {
+                        this[it.key.currentDate] = !this[it.key.currentDate]!!
+                    }
+                }, it.key.currentDate, it.key.sumAmount)
             }
-            items(it.value, key = { it.id!! }) { item ->
-                SlippableChargeUp(
-                    chargeUpDto = item, currentSlippingItem = currentSlippingItem,
-                    delClick = delClick, goDetail = goDetail
-                )
-                Spacer(Modifier.height(16.dp))
+
+            items(it.value.size, key = { index -> it.value[index].id!! }) { index ->
+                AnimatedVisibility(
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    visible = showMap[it.key.currentDate]!!,
+                    enter = fadeIn() + slideInVertically(
+                        initialOffsetY = {
+                            -it / 2 * (index + 1)
+                        },
+                        animationSpec = tween(100)
+                    ), exit = slideOutVertically(
+                        targetOffsetY = {
+                            -it / 2 * (index + 1)
+                        },
+                        animationSpec = tween(50)
+                    ) + fadeOut(animationSpec = tween(25))
+                ) {
+                    SlippableChargeUp(
+                        chargeUpDto = it.value[index],
+                        currentSlippingItem = currentSlippingItem,
+                        delClick = delClick,
+                        goDetail = goDetail
+                    )
+                }
+
+
+            }
+
+
+            item {
+                HorizontalDivider()
             }
         }
     }
@@ -202,8 +246,7 @@ fun SlippableChargeUp(
 
 @Composable
 fun ChargeUpItem(
-    modifier: Modifier = Modifier, chargeUpDto: ChargeUpDto,
-    goDetail: (Long) -> Unit = {}
+    modifier: Modifier = Modifier, chargeUpDto: ChargeUpDto, goDetail: (Long) -> Unit = {}
 ) {
     val amountTypeDto = chargeUpDto.amountType
     ElevatedCard(modifier.heightIn(min = 100.dp).clickable {

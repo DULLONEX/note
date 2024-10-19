@@ -19,11 +19,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -37,6 +42,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -62,6 +68,22 @@ import ui.screen.chargeUp.AddChargeUpCompose
 import ui.screen.chargeUp.AmountInputCompose
 import ui.screen.chargeUp.ChargeUpItem
 import ui.screen.chargeUp.StickyHeaderCompose
+import ui.screen.remind.RemindItem
+import java.util.Calendar
+
+@Composable
+@Preview
+fun MonthPreview(){
+
+}
+
+@Composable
+@Preview
+fun RemindItemPreview(){
+    RemindItem(title = "123456789123456789", time = "10-11", details = "123123123123")
+}
+
+
 
 @Composable
 @Preview

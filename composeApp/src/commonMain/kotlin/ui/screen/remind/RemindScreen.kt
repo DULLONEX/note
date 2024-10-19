@@ -289,9 +289,9 @@ fun RemindItem(
         modifier = modifier.fillMaxWidth().heightIn(min = 100.dp)
     ) {
         Column(Modifier.fillMaxSize().padding(15.dp)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = title, style = MaterialTheme.typography.titleLarge)
-                Text(text = time, style = MaterialTheme.typography.titleMedium)
+            Row(Modifier.fillMaxWidth()) {
+                Text(text = title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+                Text(text = time, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
             }
             Text(text = details.trimIndent(), style = MaterialTheme.typography.titleSmall)
         }

@@ -14,7 +14,7 @@ CREATE TABLE ChargeUp(
 selectAllChargeUp:
 SELECT t1.*,t2.message,t2.whetherSystem FROM ChargeUp AS t1
 INNER JOIN AmountType AS t2 ON t1.amountTypeId = t2.id
-WHERE t1.whetherDelete = 0 ORDER BY  t1.createTime DESC;
+WHERE t1.whetherDelete = 0 ORDER BY  t1.fillTime DESC;
 
 selectChargeUpByid:
 SELECT t1.*,t2.message,t2.whetherSystem FROM ChargeUp AS t1
