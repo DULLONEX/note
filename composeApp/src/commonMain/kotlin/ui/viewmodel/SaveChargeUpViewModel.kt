@@ -12,6 +12,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.datetime.LocalDateTime
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.error_no_amount1
@@ -20,6 +21,7 @@ import note.composeapp.generated.resources.error_no_content
 import org.jetbrains.compose.resources.StringResource
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.coroutines.resume
 
 class SaveChargeUpViewModel : ViewModel(), KoinComponent {
     private val amountService: AmountTypeService by inject()
@@ -75,10 +77,8 @@ class SaveChargeUpViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun save(): Boolean {
-        val result = CompletableDeferred<Boolean>()
-
-        viewModelScope.launch {
+    suspend fun save(): Boolean =
+        suspendCancellableCoroutine { result ->
             val errorString = checkAllInputInfo()
             if (errorString == null) {
                 if (chargeUpStatus.value.id == null) {
@@ -88,17 +88,17 @@ class SaveChargeUpViewModel : ViewModel(), KoinComponent {
                     // 更新
                     chargeUpService.updateChargeUp(chargeUpStatus.value)
                 }
-                result.complete(true)
+                result.resume(true)
             } else {
-                errorInfo.emit(errorString)
-                result.complete(false)
+                viewModelScope.launch {
+
+                    errorInfo.emit(errorString)
+                }
+                result.resume(true)
             }
+
         }
 
-        return runBlocking {
-            result.await()
-        }
-    }
 
     fun contentChange(value: String) {
         viewModelScope.launch {
