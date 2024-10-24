@@ -1,6 +1,12 @@
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -23,7 +29,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -57,8 +66,15 @@ import ui.viewmodel.FileViewModel
 fun App() {
     AppTheme {
         val navCompose = NavCompose()
+        val focusManager = LocalFocusManager.current
+        Box(Modifier.pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus()
+            })
+        }) {
+            navCompose.MainNav()
+        }
 
-        navCompose.MainNav()
     }
 }
 
@@ -72,7 +88,7 @@ class NavCompose : KoinComponent {
     fun MainNav(
         navController: NavHostController = platform.navController,
     ) {
-        val fileViewModel: FileViewModel = viewModel{ FileViewModel() }
+        val fileViewModel: FileViewModel = viewModel { FileViewModel() }
         val addRemindScreenCompose = AddRemindScreenCompose()
         val addChargeUpCompose = AddChargeUpCompose()
         val chargeUpComposeScreen = ChargeUpComposeScreen()
@@ -136,7 +152,9 @@ class NavCompose : KoinComponent {
             }
             composable(
                 route = "${Route.CHARGE_UP_DETAIL.route}/{id}",
-                arguments = listOf(navArgument("id") { type = NavType.LongType })
+                arguments = listOf(navArgument("id") { type = NavType.LongType }),
+                enterTransition = { fadeIn() }, // 页面进入动画
+                exitTransition = { fadeOut() }, // 页面退出动画
             ) { backStackEntry ->
 
                 val id: Long? = backStackEntry.arguments?.getLong("id")
@@ -212,10 +230,10 @@ class NavCompose : KoinComponent {
     @Composable
     fun BottomNavigationBar(
         modifier: Modifier = Modifier,
-        selected:Route = Route.REMIND
+        selected: Route = Route.REMIND
     ) {
         val items = returnLabelIcon()
-        NavigationBottomBar(modifier, items,selected=selected)
+        NavigationBottomBar(modifier, items, selected = selected)
     }
 
     @Composable
@@ -223,17 +241,23 @@ class NavCompose : KoinComponent {
         modifier: Modifier = Modifier,
         items: List<LabelIcon>,
         navController: NavHostController = platform.navController,
-        selected:Route = Route.REMIND
+        selected: Route = Route.REMIND
     ) {
         NavigationBar(
             modifier = modifier, tonalElevation = 0.dp
         ) {
             items.forEachIndexed { _, item ->
-                NavigationBarItem(icon = {
-                    Icon(item.icon, item.showText)
-                }, label = { Text(item.showText) }, selected = item.id == selected.route, onClick = {
-                    navController.navigate(item.id)
-                })
+                NavigationBarItem(
+                    icon = {
+                        Icon(item.icon, item.showText)
+                    },
+                    label = { Text(item.showText) },
+                    selected = item.id == selected.route,
+                    onClick = {
+                        if (item.id != selected.route) {
+                            navController.navigate(item.id)
+                        }
+                    })
             }
         }
     }

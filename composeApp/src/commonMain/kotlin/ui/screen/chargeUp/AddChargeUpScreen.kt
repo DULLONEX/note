@@ -58,6 +58,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -155,12 +156,7 @@ class AddChargeUpCompose : KoinComponent {
                     }
                 })
             }) { innerPadding ->
-            if (isReadyToShowUI) {
-                ChargeUpCompose(Modifier.fillMaxSize().padding(innerPadding))
-            } else {
-                // 显示加载状态
-                LoadCompose(Modifier.padding(innerPadding))
-            }
+            ChargeUpCompose(Modifier.fillMaxSize().padding(innerPadding))
         }
 
     }

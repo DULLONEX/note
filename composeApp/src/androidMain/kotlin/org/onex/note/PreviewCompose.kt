@@ -3,9 +3,12 @@ package org.onex.note
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +35,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -73,16 +77,50 @@ import java.util.Calendar
 
 @Composable
 @Preview
-fun MonthPreview(){
+fun ExpandableCard() {
+    var expanded by remember { mutableStateOf(false) }
+
+    // Card with a click listener
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .clickable { expanded = !expanded }
+            .animateContentSize(),  // Animate size changes
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = "Title", style = MaterialTheme.typography.labelLarge)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // AnimatedVisibility to control the visibility of the content
+            AnimatedVisibility(visible = expanded) {
+                Column {
+                    Text(
+                        text = "This is the detailed description that will appear when the card is expanded.",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = { /* Perform an action */ }) {
+                        Text("Action")
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+@Preview
+fun MonthPreview() {
 
 }
 
 @Composable
 @Preview
-fun RemindItemPreview(){
+fun RemindItemPreview() {
     RemindItem(title = "123456789123456789", time = "10-11", details = "123123123123")
 }
-
 
 
 @Composable
