@@ -52,6 +52,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -78,6 +79,7 @@ import data.entiry.AmountTypeDto
 import data.entiry.FileData
 import data.entiry.asBitmapList
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import note.composeapp.generated.resources.Res
@@ -111,8 +113,11 @@ class AddChargeUpCompose : KoinComponent {
         fileViewModel: FileViewModel = viewModel(),
         id: Long? = null
     ) {
-        val fileStatus by fileViewModel.file.collectAsState()
-
+        LaunchedEffect(Unit) {
+            fileViewModel.file.collectLatest {
+                saveChargeUpViewModel.addFile(it)
+            }
+        }
 
         val scope = rememberCoroutineScope()
         val snackarHostState = remember { SnackbarHostState() }
@@ -135,12 +140,6 @@ class AddChargeUpCompose : KoinComponent {
 
             }
             isReadyToShowUI = true  // 只有在延迟后设置状态为 true
-        }
-        LaunchedEffect(fileStatus) {
-            if (fileStatus.isNotEmpty()) {
-                saveChargeUpViewModel.addFile(fileStatus)
-                fileViewModel.clearFileList()
-            }
         }
 
         // 如果 UI 准备好才显示界面
@@ -243,7 +242,7 @@ fun AddImageCompose(
         })
     when (status) {
         SwitchImageStatus.SHOW -> {
-
+            //
         }
 
         SwitchImageStatus.SELECT -> {

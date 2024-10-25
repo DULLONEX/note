@@ -3,6 +3,7 @@ package ui.screen.chargeUp
 import NavCompose
 import Platform
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -205,7 +206,8 @@ fun SlippableChargeUp(
             },
             positionalThreshold = { distance: Float -> distance * 0.5f },
             velocityThreshold = { with(density) { 100.dp.toPx() } },
-            animationSpec = tween(),
+            snapAnimationSpec = tween(),
+            decayAnimationSpec = exponentialDecay(),
         )
     }
 

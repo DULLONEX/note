@@ -22,10 +22,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
+
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -39,7 +36,10 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +48,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
@@ -56,6 +57,7 @@ import config.RemindStatus
 import config.Route
 import config.listTab
 import data.entiry.ShowRemind
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.add_remind_info
@@ -198,7 +200,7 @@ fun BottomSheet(
                 delClick(id)
                 showChange()
             }) {
-                
+
                 Text(stringResource(Res.string.delete))
             }
         }
@@ -207,7 +209,7 @@ fun BottomSheet(
 }
 
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun RemindHorizontalPager(
     modifier: Modifier = Modifier,
@@ -218,32 +220,22 @@ fun RemindHorizontalPager(
     onClick: (id: Long) -> Unit = {}
 
 ) {
-    var refreshState by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
+
     // refresh 并没有什么用,因为flow自带刷新数据.写了懒得去删除了
-    val pullRefreshState = rememberPullRefreshState(refreshing = refreshState, {
-        scope.launch {
-            refreshState = !refreshState
+    val pullRefreshState = rememberPullToRefreshState()
+    var isRefreshing by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    val onRefresh: () -> Unit = {
+        isRefreshing = true
+        coroutineScope.launch {
             refresh()
-            refreshState = !refreshState
+            isRefreshing = false
         }
-    }, refreshThreshold = 25.dp)
-    val topDp = 60.dp
-    val minDp = 0.dp
-    // 头部动画位置
-    val animatedOffset by animateDpAsState(
-        targetValue = when {
-            pullRefreshState.progress.toInt() == 0 && refreshState -> topDp
-            else -> {
-                val tDp = minDp + (pullRefreshState.progress * (topDp - minDp))
-                tDp.coerceAtMost(topDp)
-            }
-        }, animationSpec = tween(durationMillis = 300) // Adjust duration for smoothness
-    )
+    }
 
     HorizontalPager(
         state = pagerState,
-        modifier = modifier.fillMaxSize().pullRefresh(pullRefreshState),
+        modifier = modifier.fillMaxSize(),
         verticalAlignment = Alignment.Top,
     ) { page ->
         val remindStatus = RemindStatus.fromValue(page.toLong())
@@ -252,14 +244,33 @@ fun RemindHorizontalPager(
             // 完成需要倒序 才能正确的显示出来
             currentPageReminds = currentPageReminds?.reversed()
         }
-        Box {
+        val topDp = 100.dp
+        val minDp = 0.dp
+        // 头部动画位置
+        val animatedOffset by animateDpAsState(
+            targetValue = when {
+                pullRefreshState.isAnimating -> topDp
+                else -> {
+                    val tDp = minDp + (pullRefreshState.distanceFraction * (topDp - minDp))
+                    tDp.coerceAtMost(topDp)
+                }
+            }, animationSpec = tween(durationMillis = 300) // Adjust duration for smoothness
+        )
+
+
+        PullToRefreshBox(
+            state = pullRefreshState,
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
+        ) {
             LazyColumn(
+
                 modifier = Modifier.fillMaxSize().offset(y = animatedOffset),
                 contentPadding = PaddingValues(horizontal = 5.dp, vertical = 5.dp),
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
                 if (currentPageReminds != null) {
-                    items(currentPageReminds, key = {it.id}) { item ->
+                    items(currentPageReminds, key = { it.id }) { item ->
                         RemindItem(
                             Modifier.combinedClickable(onClick = {
                                 onClick(item.id)
@@ -269,11 +280,11 @@ fun RemindHorizontalPager(
                         )
                     }
                 }
+
             }
-            PullRefreshIndicator(
-                refreshState, pullRefreshState, Modifier.align(Alignment.TopCenter), scale = true
-            )
+
         }
+
     }
 }
 
@@ -290,8 +301,16 @@ fun RemindItem(
     ) {
         Column(Modifier.fillMaxSize().padding(15.dp)) {
             Row(Modifier.fillMaxWidth()) {
-                Text(text = title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-                Text(text = time, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = time,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f)
+                )
             }
             Text(text = details.trimIndent(), style = MaterialTheme.typography.titleSmall)
         }

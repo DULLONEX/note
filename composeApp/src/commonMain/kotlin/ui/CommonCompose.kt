@@ -462,7 +462,7 @@ fun DraggableItem(
                     x = state.requireOffset().roundToInt(),
                     y = 0,
                 )
-            }.anchoredDraggable(state, Orientation.Horizontal, reverseDirection = false),
+            }.anchoredDraggable(state, Orientation.Horizontal),
             content = content
         )
     }

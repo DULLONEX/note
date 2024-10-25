@@ -1,5 +1,7 @@
 package org.onex.note
 
+import androidx.compose.animation.core.DecayAnimationSpec
+import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -62,7 +64,9 @@ fun BehindMotionSwipeDemo() {
             },
             positionalThreshold = { distance: Float -> distance * 0.5f },
             velocityThreshold = { with(density) { 100.dp.toPx() } },
-            animationSpec = tween(),
+            snapAnimationSpec = tween(),
+            decayAnimationSpec = exponentialDecay(),
+
         )
     }
     DraggableItem(state = state, content = {
@@ -159,7 +163,7 @@ fun DraggableItem(
                     y = 0,
                 )
             }
-            .anchoredDraggable(state, Orientation.Horizontal, reverseDirection = false),
+            .anchoredDraggable(state, Orientation.Horizontal),
             content = content)
     }
 }

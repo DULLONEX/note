@@ -22,13 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -44,6 +38,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -74,6 +71,14 @@ import ui.screen.chargeUp.ChargeUpItem
 import ui.screen.chargeUp.StickyHeaderCompose
 import ui.screen.remind.RemindItem
 import java.util.Calendar
+
+@Composable
+@Preview
+fun ArrayPreview() {
+
+
+}
+
 
 @Composable
 @Preview
@@ -277,7 +282,7 @@ fun ImagePreview() {
         SnackbarHost(hostState = snackbarHostState) { data ->
             Snackbar(
                 snackbarData = data,
-                backgroundColor = MaterialTheme.colorScheme.errorContainer, // 设置背景颜色为警告颜色
+
                 contentColor = MaterialTheme.colorScheme.error // 设置文字颜色为白色
             )
         }
