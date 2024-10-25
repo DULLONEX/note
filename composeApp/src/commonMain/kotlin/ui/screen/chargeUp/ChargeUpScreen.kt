@@ -49,8 +49,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -226,7 +228,7 @@ fun SlippableChargeUp(
     }
 
     DraggableItem(state = state, content = {
-        ChargeUpItem(modifier.fillMaxHeight(), chargeUpDto, goDetail)
+        ChargeUpItem(modifier.fillMaxHeight().heightIn(max = 100.dp), chargeUpDto, goDetail)
     }, endAction = {
         DelAction(Modifier.fillMaxHeight().align(Alignment.CenterEnd)
             .background(MaterialTheme.colorScheme.error).width(defaultActionSize).fillMaxHeight()
@@ -260,7 +262,7 @@ fun ChargeUpItem(
                 Text(
                     modifier = Modifier.weight(0.4f),
                     text = chargeUpDto.fillTime.formatToString(),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 Row(
                     modifier = Modifier.weight(0.6f),
@@ -289,7 +291,8 @@ fun ChargeUpItem(
             Text(
                 chargeUpDto.content,
                 Modifier.padding(start = 16.dp),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                overflow = TextOverflow.Ellipsis,
             )
         }
 
