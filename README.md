@@ -1,14 +1,8 @@
 This is a Kotlin Multiplatform project targeting Android, iOS.
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
-
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
-
-
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+用于完成个人需求的一些事情
+提醒：用于添加时间和系统中日历相互绑定通过系统提醒来完成提醒功能 （目的记录一些我待会要去干的事情）
+![img.png](img/img.png)
+记账 用于控制消费记录信息
+![img3.png](img/img3.png)
+![img.png](img/img2.png)1
