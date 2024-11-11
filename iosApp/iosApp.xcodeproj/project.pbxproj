@@ -10,10 +10,11 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
-		4B4020082CBA421C007F6988 /* IOSDatabaseDriverFactory.kt in Resources */ = {isa = PBXBuildFile; fileRef = 4B4020002CBA421C007F6988 /* IOSDatabaseDriverFactory.kt */; };
-		4B4020092CBA421C007F6988 /* appModule.kt in Resources */ = {isa = PBXBuildFile; fileRef = 4B4020022CBA421C007F6988 /* appModule.kt */; };
-		4B40200A2CBA421C007F6988 /* MainViewController.kt in Resources */ = {isa = PBXBuildFile; fileRef = 4B4020042CBA421C007F6988 /* MainViewController.kt */; };
-		4B40200B2CBA421C007F6988 /* Platform.ios.kt in Resources */ = {isa = PBXBuildFile; fileRef = 4B4020052CBA421C007F6988 /* Platform.ios.kt */; };
+		4B75CAFF2CE2026B00D89BC8 /* Platform.ios.kt in Resources */ = {isa = PBXBuildFile; fileRef = 4B75CAFC2CE2026B00D89BC8 /* Platform.ios.kt */; };
+		4B75CB002CE2026B00D89BC8 /* MainViewController.kt in Resources */ = {isa = PBXBuildFile; fileRef = 4B75CAFB2CE2026B00D89BC8 /* MainViewController.kt */; };
+		4B75CB012CE2026B00D89BC8 /* appModule.kt in Resources */ = {isa = PBXBuildFile; fileRef = 4B75CAF82CE2026B00D89BC8 /* appModule.kt */; };
+		4B75CB022CE2026B00D89BC8 /* IOSDatabaseDriverFactory.kt in Resources */ = {isa = PBXBuildFile; fileRef = 4B75CAF62CE2026B00D89BC8 /* IOSDatabaseDriverFactory.kt */; };
+		4B75CB032CE2026B00D89BC8 /* Camera.kt in Resources */ = {isa = PBXBuildFile; fileRef = 4B75CAFA2CE2026B00D89BC8 /* Camera.kt */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
@@ -50,10 +51,11 @@
 		4B401FFB2CBA2165007F6988 /* CommonCompose.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CommonCompose.kt; sourceTree = "<group>"; };
 		4B401FFD2CBA2165007F6988 /* App.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = App.kt; sourceTree = "<group>"; };
 		4B401FFE2CBA2165007F6988 /* Platform.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Platform.kt; sourceTree = "<group>"; };
-		4B4020002CBA421C007F6988 /* IOSDatabaseDriverFactory.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = IOSDatabaseDriverFactory.kt; sourceTree = "<group>"; };
-		4B4020022CBA421C007F6988 /* appModule.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = appModule.kt; sourceTree = "<group>"; };
-		4B4020042CBA421C007F6988 /* MainViewController.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = MainViewController.kt; sourceTree = "<group>"; };
-		4B4020052CBA421C007F6988 /* Platform.ios.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Platform.ios.kt; sourceTree = "<group>"; };
+		4B75CAF62CE2026B00D89BC8 /* IOSDatabaseDriverFactory.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = IOSDatabaseDriverFactory.kt; sourceTree = "<group>"; };
+		4B75CAF82CE2026B00D89BC8 /* appModule.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = appModule.kt; sourceTree = "<group>"; };
+		4B75CAFA2CE2026B00D89BC8 /* Camera.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Camera.kt; sourceTree = "<group>"; };
+		4B75CAFB2CE2026B00D89BC8 /* MainViewController.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = MainViewController.kt; sourceTree = "<group>"; };
+		4B75CAFC2CE2026B00D89BC8 /* Platform.ios.kt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Platform.ios.kt; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* Note.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Note.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -203,37 +205,38 @@
 			path = ../composeApp/src/commonMain/kotlin;
 			sourceTree = SOURCE_ROOT;
 		};
-		4B4020012CBA421C007F6988 /* data */ = {
+		4B75CAF72CE2026B00D89BC8 /* data */ = {
 			isa = PBXGroup;
 			children = (
-				4B4020002CBA421C007F6988 /* IOSDatabaseDriverFactory.kt */,
+				4B75CAF62CE2026B00D89BC8 /* IOSDatabaseDriverFactory.kt */,
 			);
 			path = data;
 			sourceTree = "<group>";
 		};
-		4B4020032CBA421C007F6988 /* di */ = {
+		4B75CAF92CE2026B00D89BC8 /* di */ = {
 			isa = PBXGroup;
 			children = (
-				4B4020022CBA421C007F6988 /* appModule.kt */,
+				4B75CAF82CE2026B00D89BC8 /* appModule.kt */,
 			);
 			path = di;
 			sourceTree = "<group>";
 		};
-		4B4020062CBA421C007F6988 /* kotlin */ = {
+		4B75CAFD2CE2026B00D89BC8 /* kotlin */ = {
 			isa = PBXGroup;
 			children = (
-				4B4020012CBA421C007F6988 /* data */,
-				4B4020032CBA421C007F6988 /* di */,
-				4B4020042CBA421C007F6988 /* MainViewController.kt */,
-				4B4020052CBA421C007F6988 /* Platform.ios.kt */,
+				4B75CAF72CE2026B00D89BC8 /* data */,
+				4B75CAF92CE2026B00D89BC8 /* di */,
+				4B75CAFA2CE2026B00D89BC8 /* Camera.kt */,
+				4B75CAFB2CE2026B00D89BC8 /* MainViewController.kt */,
+				4B75CAFC2CE2026B00D89BC8 /* Platform.ios.kt */,
 			);
 			path = kotlin;
 			sourceTree = "<group>";
 		};
-		4B4020072CBA421C007F6988 /* iosMain */ = {
+		4B75CAFE2CE2026B00D89BC8 /* iosMain */ = {
 			isa = PBXGroup;
 			children = (
-				4B4020062CBA421C007F6988 /* kotlin */,
+				4B75CAFD2CE2026B00D89BC8 /* kotlin */,
 			);
 			name = iosMain;
 			path = ../composeApp/src/iosMain;
@@ -242,7 +245,7 @@
 		4B9236282CBA1AB400135C1D /* kotlin-debug */ = {
 			isa = PBXGroup;
 			children = (
-				4B4020072CBA421C007F6988 /* iosMain */,
+				4B75CAFE2CE2026B00D89BC8 /* iosMain */,
 				4B401FFF2CBA2165007F6988 /* kotlin */,
 			);
 			path = "kotlin-debug";
@@ -352,10 +355,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B4020082CBA421C007F6988 /* IOSDatabaseDriverFactory.kt in Resources */,
-				4B4020092CBA421C007F6988 /* appModule.kt in Resources */,
-				4B40200A2CBA421C007F6988 /* MainViewController.kt in Resources */,
-				4B40200B2CBA421C007F6988 /* Platform.ios.kt in Resources */,
+				4B75CAFF2CE2026B00D89BC8 /* Platform.ios.kt in Resources */,
+				4B75CB002CE2026B00D89BC8 /* MainViewController.kt in Resources */,
+				4B75CB012CE2026B00D89BC8 /* appModule.kt in Resources */,
+				4B75CB022CE2026B00D89BC8 /* IOSDatabaseDriverFactory.kt in Resources */,
+				4B75CB032CE2026B00D89BC8 /* Camera.kt in Resources */,
 				058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */,
 				058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */,
 			);

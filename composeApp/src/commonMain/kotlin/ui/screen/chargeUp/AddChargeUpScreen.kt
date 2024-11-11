@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -303,10 +304,11 @@ fun SelectedFileImageCompose(
     }
     if (showSheet) {
         ModalBottomSheet(
-            modifier = Modifier.fillMaxHeight(0.3f),
+            modifier = Modifier,
+
             onDismissRequest = { showSheet = !showSheet }) {
             Column(
-                Modifier.fillMaxSize(),
+                Modifier.height(150.dp).fillMaxWidth(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -422,13 +424,12 @@ fun AmountTypeBottomSheet(
     var text by remember { mutableStateOf(amountType.message) }
     ModalBottomSheet(
         modifier = modifier,
-        sheetState = rememberModalBottomSheetState(true),
         onDismissRequest = {
             onDismiss()
         }) {
         Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
+            Modifier.height(150.dp).fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             CenteredTextField(

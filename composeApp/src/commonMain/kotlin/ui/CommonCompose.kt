@@ -361,7 +361,7 @@ fun CenteredTextField(
         textFieldValue.value = textFieldValue.value.copy(
             selection = TextRange(textFieldValue.value.text.length) // 光标始终在文本末尾
         )
-
+        delay(300)
         focusRequester.requestFocus() // 请求焦点
         keyboardController?.show() // 显示软键盘
     }

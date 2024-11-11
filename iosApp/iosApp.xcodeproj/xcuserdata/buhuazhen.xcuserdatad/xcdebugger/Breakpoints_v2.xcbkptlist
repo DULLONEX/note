@@ -23,17 +23,147 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "F39E9D19-3E92-40D1-BB51-0A805D7692E6"
+            uuid = "141B9BED-8D8F-4B7C-8D73-B73EEF22AEA8"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../composeApp/src/commonMain/kotlin/ui/theme/Theme.kt"
+            filePath = "../composeApp/src/iosMain/kotlin/Camera.kt"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "284"
-            endingLineNumber = "284"
+            startingLineNumber = "144"
+            endingLineNumber = "144"
             landmarkName = "unknown"
             landmarkType = "0">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4931EF48-47C8-4625-91EC-F18933585BCB"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../composeApp/src/iosMain/kotlin/Camera.kt"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "122"
+            endingLineNumber = "122"
+            landmarkName = "unknown"
+            landmarkType = "0">
+            <Locations>
+               <Location
+                  uuid = "4931EF48-47C8-4625-91EC-F18933585BCB - 90830b056ed43bbf"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "kfun:#CameraShoot(androidx.compose.ui.Modifier?;kotlin.Function0&lt;kotlin.Unit&gt;;kotlin.Function1&lt;androidx.compose.ui.graphics.ImageBitmap,kotlin.Unit&gt;;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}"
+                  moduleName = "ComposeApp"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ONEX/AndroidStudioProjects/Note/composeApp/src/iosMain/kotlin/Camera.kt"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "122"
+                  endingLineNumber = "122">
+               </Location>
+               <Location
+                  uuid = "4931EF48-47C8-4625-91EC-F18933585BCB - 63d5d3d4bb1647b5"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "kfun:CameraShoot$lambda$14#internal"
+                  moduleName = "ComposeApp"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ONEX/AndroidStudioProjects/Note/composeApp/src/iosMain/kotlin/Camera.kt"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "122"
+                  endingLineNumber = "122">
+               </Location>
+               <Location
+                  uuid = "4931EF48-47C8-4625-91EC-F18933585BCB - 7da70bc0e91316aa"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "kfun:$CameraShoot$lambda$14$FUNCTION_REFERENCE$5.invoke#internal"
+                  moduleName = "ComposeApp"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ONEX/AndroidStudioProjects/Note/composeApp/src/iosMain/kotlin/Camera.kt"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "122"
+                  endingLineNumber = "122">
+               </Location>
+               <Location
+                  uuid = "4931EF48-47C8-4625-91EC-F18933585BCB - 5e47c31ee287d3ee"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "kfun:$CameraShoot$lambda$14$FUNCTION_REFERENCE$5.&lt;init&gt;#internal"
+                  moduleName = "ComposeApp"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ONEX/AndroidStudioProjects/Note/composeApp/src/iosMain/kotlin/Camera.kt"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "122"
+                  endingLineNumber = "122">
+               </Location>
+               <Location
+                  uuid = "4931EF48-47C8-4625-91EC-F18933585BCB - 41247ec72d89ec82"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "kfun:$CameraShoot$lambda$14$FUNCTION_REFERENCE$5.$&lt;bridge-UNNNB&gt;invoke(androidx.compose.runtime.Composer;kotlin.Int){}#internal"
+                  moduleName = "ComposeApp"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ONEX/AndroidStudioProjects/Note/composeApp/src/iosMain/kotlin/Camera.kt"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "122"
+                  endingLineNumber = "122">
+               </Location>
+               <Location
+                  uuid = "4931EF48-47C8-4625-91EC-F18933585BCB - 3a7eeb15a8ed44ba"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "kfun:$CameraShoot$lambda$19$FUNCTION_REFERENCE$8.invoke#internal"
+                  moduleName = "ComposeApp"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ONEX/AndroidStudioProjects/Note/composeApp/src/iosMain/kotlin/Camera.kt"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "122"
+                  endingLineNumber = "122">
+               </Location>
+               <Location
+                  uuid = "4931EF48-47C8-4625-91EC-F18933585BCB - 1b1ea0b3a25201fe"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "kfun:$CameraShoot$lambda$19$FUNCTION_REFERENCE$8.&lt;init&gt;#internal"
+                  moduleName = "ComposeApp"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ONEX/AndroidStudioProjects/Note/composeApp/src/iosMain/kotlin/Camera.kt"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "122"
+                  endingLineNumber = "122">
+               </Location>
+               <Location
+                  uuid = "4931EF48-47C8-4625-91EC-F18933585BCB - 538e468410dbb64"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "kfun:$CameraShoot$lambda$19$FUNCTION_REFERENCE$8.$&lt;bridge-UNN&gt;invoke(){}#internal"
+                  moduleName = "ComposeApp"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ONEX/AndroidStudioProjects/Note/composeApp/src/iosMain/kotlin/Camera.kt"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "122"
+                  endingLineNumber = "122">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

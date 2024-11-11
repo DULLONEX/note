@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.interop.UIKitView
+import androidx.compose.ui.viewinterop.UIKitInteropProperties
+import androidx.compose.ui.viewinterop.UIKitView
 import androidx.compose.ui.zIndex
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -118,9 +120,14 @@ fun CameraShoot(
 
 
     CameraCompose(modifier = modifier, back = back, cameraPreview = {
-        UIKitView(
-            modifier = Modifier.fillMaxSize(),
-            background = Color.Black,
+        { container: UIView, rect: CValue<CGRect> ->
+            CATransaction.begin()
+            CATransaction.setValue(true, kCATransactionDisableActions)
+            container.layer.setFrame(rect)
+            cameraPreviewLayer.setFrame(rect)
+            CATransaction.commit()
+        }
+        UIKitView<UIView>(
             factory = {
                 val container = UIView()
                 container.layer.addSublayer(cameraPreviewLayer)
@@ -128,11 +135,15 @@ fun CameraShoot(
                 session.startRunning()
                 container
             },
-            onResize = { container: UIView, rect: CValue<CGRect> ->
+            modifier = Modifier.fillMaxSize(),
+            properties = UIKitInteropProperties(
+                isInteractive = true,
+                isNativeAccessibilityEnabled = true
+            ),
+            update = {
                 CATransaction.begin()
                 CATransaction.setValue(true, kCATransactionDisableActions)
-                container.layer.setFrame(rect)
-                cameraPreviewLayer.setFrame(rect)
+                cameraPreviewLayer.frame = it.bounds
                 CATransaction.commit()
             }
         )
