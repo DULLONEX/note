@@ -59,3 +59,5 @@ expect fun isSameWeek(year1: Int, month1: Int, day1: Int, year2: Int, month2: In
  * @return
  */
 expect fun sumAmount(amount:List<String>):String
+
+var changeScreenOrientationFunc: ((to: Int) -> Unit)? = null

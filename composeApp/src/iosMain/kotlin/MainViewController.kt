@@ -26,6 +26,12 @@ fun ComposeEntryPointWithUIViewController(
         }
         isKoinStarted = true
     }
-
     App()
+
+   // changeScreenOrientationFunc?.invoke(12312421)
+
+}
+
+fun changeScreenOrientation(callBack: (to: Int) -> Unit) {
+    changeScreenOrientationFunc = callBack
 }
