@@ -365,7 +365,6 @@ fun CenteredTextField(
         focusRequester.requestFocus() // 请求焦点
         keyboardController?.show() // 显示软键盘
     }
-    // todo 没有文字的时候光标不显示在中心
     Box(
         contentAlignment = Alignment.Center, modifier = modifier.fillMaxWidth() // 使Box填满父容器宽度
     ) {
