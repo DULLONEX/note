@@ -94,7 +94,7 @@ class SaveChargeUpViewModel : ViewModel(), KoinComponent {
 
                     errorInfo.emit(errorString)
                 }
-                result.resume(true)
+                result.resume(false)
             }
 
         }

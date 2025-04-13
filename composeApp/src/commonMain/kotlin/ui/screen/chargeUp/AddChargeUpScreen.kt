@@ -128,12 +128,14 @@ class AddChargeUpCompose : KoinComponent {
         var isReadyToShowUI by remember { mutableStateOf(false) }
 
         // Snackbar 提示
-        errorInfo?.let {
-            val stringResource = stringResource(it)
-            scope.launch {
-                snackarHostState.showSnackbar(stringResource)
+        var sR = errorInfo?.let { stringResource(it) }
+        LaunchedEffect(id, errorInfo) {
+            sR?.let {
+                snackarHostState.showSnackbar(sR, withDismissAction = true)
+                saveChargeUpViewModel.errorInfo.emit(null)
             }
         }
+
         LaunchedEffect(id) {
             if (id != null && saveChargeUpViewModel.chargeUpStatus.value.id != id) {
                 saveChargeUpViewModel.loadChargeUpById(id)
