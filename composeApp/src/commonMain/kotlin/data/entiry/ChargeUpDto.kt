@@ -55,3 +55,8 @@ fun SelectAllChargeUp.toChargeUpDto(): ChargeUpDto {
         formatDateString(this.createTime)
     )
 }
+
+data class SimpleChargeUpSheet(
+    val totalAmount:String = "0",
+    val averageAmount:String = "0"
+)

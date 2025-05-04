@@ -47,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.key.Key.Companion.R
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -61,8 +62,11 @@ import config.formatToString
 import config.getStringResource
 import data.entiry.ChargeUpDto
 import data.entiry.MonthSumCharge
+import data.entiry.SimpleChargeUpSheet
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.add_charge_up_info
+import note.composeapp.generated.resources.month_consumption
+import note.composeapp.generated.resources.total_consumption
 import org.jetbrains.compose.resources.stringResource
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -85,6 +89,7 @@ class ChargeUpComposeScreen : KoinComponent {
         ) {
         val navCompose = NavCompose()
         val chargeUpMap by viewModel.chargeUpMap.collectAsState()
+        val simpleChargeUpSheet by viewModel.simpleSheet.collectAsState()
         Scaffold(modifier, floatingActionButton = {
             navCompose.FloatingAction(
                 toRoute = Route.CHARGE_UP_ADD,
@@ -99,7 +104,7 @@ class ChargeUpComposeScreen : KoinComponent {
              */
             ChargeUpCompose(Modifier, chargeUpMap, delClick = viewModel::delById, goDetail = {
                 navController.navigate("${Route.CHARGE_UP_DETAIL.route}/$it")
-            })
+            },simpleChargeUpSheet = simpleChargeUpSheet)
         }
     }
 }
@@ -111,7 +116,8 @@ fun ChargeUpCompose(
     modifier: Modifier = Modifier,
     chargeUpMapList: Map<MonthSumCharge, List<ChargeUpDto>> = hashMapOf(),
     delClick: (Long) -> Unit = {},
-    goDetail: (Long) -> Unit = {}
+    goDetail: (Long) -> Unit = {},
+    simpleChargeUpSheet: SimpleChargeUpSheet = SimpleChargeUpSheet()
 ) {
     val currentSlippingItem = remember { mutableStateOf<Long?>(null) }
     var showMap by rememberSaveable(chargeUpMapList) {
@@ -121,6 +127,14 @@ fun ChargeUpCompose(
     }
 
     LazyColumn(modifier.padding(horizontal = 4.dp)) {
+        // 添加总消费，和月平均消费信息
+        stickyHeader {
+            SimpleStatisticsHeaderCompose(
+                totalMoney = simpleChargeUpSheet.totalAmount,
+                monthAverage = simpleChargeUpSheet.averageAmount
+            )
+        }
+
         chargeUpMapList.forEach { it ->
 
             stickyHeader {
@@ -165,6 +179,25 @@ fun ChargeUpCompose(
         }
     }
 }
+
+
+@Composable
+fun SimpleStatisticsHeaderCompose(
+    modifier: Modifier = Modifier,
+    totalMoney: String = "0.00",
+    monthAverage: String = "0.00"
+) {
+    Row(
+        modifier = modifier.fillMaxWidth().background(MaterialTheme.colorScheme.onPrimary)
+            .padding(vertical = 16.dp),
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text("${stringResource(Res.string.total_consumption)}: $totalMoney")
+        Text("${stringResource(Res.string.month_consumption)}: $monthAverage")
+    }
+}
+
 
 @Composable
 fun StickyHeaderCompose(

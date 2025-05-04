@@ -26,5 +26,7 @@
     <string name="error_no_amount2">Please select the type of consumption.</string>">
     <string name="delete">delete</string>">
     <string name="confirm_del">Confirm delete</string>
+    <string name="total_consumption">TC</string>
+    <string name="month_consumption">MC</string>
 
 </resources>

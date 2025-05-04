@@ -31,4 +31,17 @@ UPDATE ChargeUp SET content = ?,amount = ?,files = ?,amountTypeId = ?,fillTime =
 delChargeUp:
 UPDATE ChargeUp SET whetherDelete = 1 WHERE id = ?;
 
+sumAmount:
+SELECT ROUND(sum(amount),2) AS totalAmount FROM ChargeUp WHERE  whetherDelete = 0;
 
+monthAverageAmount:
+SELECT AVG(monthTotal) AS average_amount FROM (
+  SELECT
+    CAST(strftime('%Y', fillTime / 1000, 'unixepoch') AS INTEGER) AS year,
+    CAST(strftime('%m', fillTime / 1000, 'unixepoch') AS INTEGER) AS month,
+    ROUND(SUM(amount), 2) AS monthTotal
+  FROM ChargeUp
+  WHERE whetherDelete = 0 AND fillTime IS NOT NULL AND amount IS NOT NULL
+  GROUP BY
+    year,month
+);

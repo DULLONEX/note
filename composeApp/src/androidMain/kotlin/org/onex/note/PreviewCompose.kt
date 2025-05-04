@@ -68,6 +68,7 @@ import ui.CenteredTextField
 import ui.screen.chargeUp.AddChargeUpCompose
 import ui.screen.chargeUp.AmountInputCompose
 import ui.screen.chargeUp.ChargeUpItem
+import ui.screen.chargeUp.SimpleStatisticsHeaderCompose
 import ui.screen.chargeUp.StickyHeaderCompose
 import ui.screen.remind.RemindItem
 import java.util.Calendar
@@ -120,6 +121,14 @@ fun ExpandableCard() {
 fun MonthPreview() {
 
 }
+
+
+@Composable
+@Preview
+fun SimpleStatisticsHeaderComposePreview(){
+    SimpleStatisticsHeaderCompose()
+}
+
 
 @Composable
 @Preview

@@ -14,11 +14,13 @@ import data.entiry.AmountTypeDto
 import data.entiry.ChargeUpDto
 import data.entiry.FileData
 import data.entiry.MonthSumCharge
+import data.entiry.SimpleChargeUpSheet
 import data.entiry.toChargeUpDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -35,6 +37,8 @@ interface ChargeUpService {
     fun findAllChargeUp(): Flow<Map<MonthSumCharge, List<ChargeUpDto>>>
 
     fun deleteChargeUp(id: Long)
+
+    fun findSimpleCharUpSheet():Flow<SimpleChargeUpSheet>
 
     suspend fun findChargeUpById(id: Long): ChargeUpDto
 }
@@ -93,6 +97,30 @@ class ChargeUpServiceImpl : ChargeUpService, KoinComponent {
 
     override fun deleteChargeUp(id: Long) {
         database.chargeUpQueries.delChargeUp(id)
+    }
+
+    override fun findSimpleCharUpSheet(): Flow<SimpleChargeUpSheet> {
+        return combine(
+            sumAmount(),
+            monthAverageAmount()
+        ) { total, average ->
+            SimpleChargeUpSheet(
+                totalAmount = total,
+                averageAmount = average
+            )
+        }
+    }
+
+    fun sumAmount(): Flow<String> {
+        return database.chargeUpQueries.sumAmount().asFlow().mapToOne(Dispatchers.IO).map {
+            (it.totalAmount ?: 0).toString()
+        }
+    }
+
+    fun monthAverageAmount(): Flow<String> {
+        return database.chargeUpQueries.monthAverageAmount().asFlow().mapToOne(Dispatchers.IO).map {
+            (it.average_amount ?: 0).toString()
+        }
     }
 
     override suspend fun findChargeUpById(id: Long): ChargeUpDto {
