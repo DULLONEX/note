@@ -120,7 +120,7 @@ fun ChargeUpCompose(
     simpleChargeUpSheet: SimpleChargeUpSheet = SimpleChargeUpSheet()
 ) {
     val currentSlippingItem = remember { mutableStateOf<Long?>(null) }
-    var showMap by rememberSaveable(chargeUpMapList) {
+    var showMap by rememberSaveable(chargeUpMapList.size) {
         mutableStateOf(
             chargeUpMapList.keys.asSequence().map { it.currentDate to true }.toMap()
         )
