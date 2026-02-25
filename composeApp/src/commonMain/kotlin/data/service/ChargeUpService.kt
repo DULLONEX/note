@@ -8,6 +8,7 @@ import config.convertLocalDateTime
 import config.formatDateString
 import config.formatToString
 import config.getCurrentDateTimeLong
+import config.monthRange
 import config.toLong
 import data.Database
 import data.entiry.AmountTypeDto
@@ -15,11 +16,13 @@ import data.entiry.ChargeUpDto
 import data.entiry.FileData
 import data.entiry.MonthSumCharge
 import data.entiry.SimpleChargeUpSheet
+import data.entiry.TypeStatistic
 import data.entiry.toChargeUpDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -38,9 +41,13 @@ interface ChargeUpService {
 
     fun deleteChargeUp(id: Long)
 
-    fun findSimpleCharUpSheet():Flow<SimpleChargeUpSheet>
+    fun findSimpleCharUpSheet(): Flow<SimpleChargeUpSheet>
 
     suspend fun findChargeUpById(id: Long): ChargeUpDto
+
+    fun getAllChargeUpStatisticsGroupType(): Flow<List<TypeStatistic>>
+
+    fun getAllChargeUpStatisticsGroupTypeBySomeMonth(year: Int, month: Int): Flow<List<TypeStatistic>>
 }
 
 class ChargeUpServiceImpl : ChargeUpService, KoinComponent {
@@ -143,5 +150,34 @@ class ChargeUpServiceImpl : ChargeUpService, KoinComponent {
             )
             return dto
         }
+    }
+
+    override fun getAllChargeUpStatisticsGroupType(): Flow<List<TypeStatistic>> {
+        return database.chargeUpQueries
+            .getAllChargeUpStatisticsGroupType()
+            .asFlow()
+            .map { query ->
+                query.executeAsList().map {
+                    TypeStatistic(
+                        type = it.type,
+                        amount = it.amount ?: 0.0
+                    )
+                }
+            }
+    }
+
+    override fun getAllChargeUpStatisticsGroupTypeBySomeMonth(year: Int, month: Int): Flow<List<TypeStatistic>> {
+        val monthRange = monthRange(year, month);
+        return database.chargeUpQueries
+            .getAllChargeUpStatisticsGroupTypeBySomeMonth(monthRange.first,monthRange.second)
+            .asFlow()
+            .map { query ->
+                query.executeAsList().map {
+                    TypeStatistic(
+                        type = it.type,
+                        amount = it.amount ?: 0.0
+                    )
+                }
+            }
     }
 }

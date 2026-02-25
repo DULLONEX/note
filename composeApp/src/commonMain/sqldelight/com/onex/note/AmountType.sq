@@ -25,3 +25,4 @@ WHERE id = :id;
 
 findAmountTypeAll:
 SELECT * FROM AmountType WHERE  whetherDelete = 0 ORDER BY id;
+

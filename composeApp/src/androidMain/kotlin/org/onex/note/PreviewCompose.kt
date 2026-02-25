@@ -80,6 +80,12 @@ fun ArrayPreview() {
 
 }
 
+@Composable
+@Preview
+fun StickyHeaderComposePreview(){
+    StickyHeaderCompose(date = "2022-1-1", sumAmount = "444.4")
+}
+
 
 @Composable
 @Preview
@@ -170,18 +176,6 @@ fun ChargeUpItemPreview() {
 }
 
 
-@Composable
-@Preview
-fun StickyHeaderComposePreview() {
-    Row(
-        Modifier.fillMaxSize(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        CircularProgressIndicator()
-    }
-
-}
 
 @Composable
 @Preview

@@ -107,7 +107,7 @@ class NavCompose : KoinComponent {
             }
         }
         NavHost(navController = navController,
-            startDestination = Route.REMIND.route,
+            startDestination = Route.CHARGE_UP.route,
             modifier = Modifier.fillMaxSize(),
             enterTransition = { fadeIn(animationSpec = tween(0)) },
             exitTransition = { fadeOut(animationSpec = tween(0)) }) {

@@ -8,6 +8,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,6 +40,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -71,6 +74,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
@@ -79,6 +83,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
+import config.YearMonth
+import data.entiry.TypeStatistic
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -396,7 +402,7 @@ fun PictureViewer(
             contentAlignment = Alignment.Center
         ) {
             Dialog(onDismissRequest = onDismissRequest) {
-                Image(bitmap, "",contentScale = ContentScale.Crop)
+                Image(bitmap, "", contentScale = ContentScale.Crop)
             }
         }
     }
@@ -540,4 +546,132 @@ class NoRippleInteractionSource : MutableInteractionSource {
 
 }
 
+@Composable
+fun YearMonthSelector(
+    selected: YearMonth,
+    onChange: (YearMonth) -> Unit,
+    showAll: Boolean,
+    onToggleAll: () -> Unit
+) {
 
+    val current = YearMonth.now()
+
+    val canGoNext =
+        selected.year < current.year ||
+                (selected.year == current.year && selected.month < current.month)
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+
+        // 左侧标题
+        Text(
+            text = if (showAll) "全部统计" else selected.toString(),
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        // 右侧控制区
+        Row {
+
+            // ⭐ 只有不选择全部时才显示月份切换
+            if (!showAll) {
+
+                Row {
+
+                    TextButton(onClick = {
+                        onChange(selected.minusMonths(1))
+                    }) {
+                        Text("<")
+                    }
+
+                    // ⭐ 右侧占位
+                    Box(
+                        modifier = Modifier.width(48.dp)
+                    ) {
+                        if (canGoNext) {
+                            TextButton(
+                                onClick = {
+                                    val next = selected.plusMonths(1)
+                                    onChange(next)
+                                }
+                            ) {
+                                Text(">")
+                            }
+                        }
+                    }
+                }
+
+
+            }
+            TextButton(onClick = onToggleAll) {
+                Text(if (showAll) "全部统计" else "按月统计")
+            }
+        }
+    }
+
+    @Composable
+    fun PieChart(data: List<TypeStatistic>) {
+
+        val total = data.sumOf { it.amount }
+        val sorted = data.sortedByDescending { it.amount }
+
+        Canvas(
+            modifier = Modifier
+                .size(200.dp)
+
+        ) {
+
+            var startAngle = -90f
+
+            sorted.forEachIndexed { index, item ->
+
+                val sweep = (item.amount / total * 360f).toFloat()
+
+                drawArc(
+                    color = Color.hsv(
+                        hue = (index * 40f) % 360,
+                        saturation = 0.6f,
+                        value = 0.9f
+                    ),
+                    startAngle = startAngle,
+                    sweepAngle = sweep,
+                    useCenter = true
+                )
+
+                startAngle += sweep
+            }
+        }
+    }
+}
+
+
+@Composable
+fun StatisticTable(data: List<TypeStatistic>) {
+
+    val sorted = data.sortedByDescending { it.amount }
+
+    Column {
+
+        sorted.forEach {
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 6.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Text(it.type)
+
+                Text(
+                    it.amount.toString(),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            HorizontalDivider()
+        }
+    }
+}

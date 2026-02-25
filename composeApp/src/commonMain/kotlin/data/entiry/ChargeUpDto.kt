@@ -60,3 +60,8 @@ data class SimpleChargeUpSheet(
     val totalAmount:String = "0",
     val averageAmount:String = "0"
 )
+
+data class TypeStatistic(
+    val type: String,
+    val amount: Double
+)

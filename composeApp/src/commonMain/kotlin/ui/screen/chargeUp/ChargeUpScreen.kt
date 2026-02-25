@@ -7,9 +7,7 @@ import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -29,12 +27,19 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -47,22 +52,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.input.key.Key.Companion.R
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import config.Route
+import config.YearMonth
 import config.formatToString
 import config.getStringResource
 import data.entiry.ChargeUpDto
 import data.entiry.MonthSumCharge
 import data.entiry.SimpleChargeUpSheet
+import data.entiry.TypeStatistic
 import note.composeapp.generated.resources.Res
 import note.composeapp.generated.resources.add_charge_up_info
 import note.composeapp.generated.resources.month_consumption
@@ -74,6 +80,8 @@ import ui.DelAction
 import ui.DeleteConfirmationDialog
 import ui.DragAnchors
 import ui.DraggableItem
+import ui.StatisticTable
+import ui.YearMonthSelector
 import ui.viewmodel.ChargeUpViewModel
 import kotlin.math.roundToInt
 
@@ -90,6 +98,10 @@ class ChargeUpComposeScreen : KoinComponent {
         val navCompose = NavCompose()
         val chargeUpMap by viewModel.chargeUpMap.collectAsState()
         val simpleChargeUpSheet by viewModel.simpleSheet.collectAsState()
+
+        val totalStatisticsList by viewModel.statisticsList.collectAsState()
+
+
         Scaffold(modifier, floatingActionButton = {
             navCompose.FloatingAction(
                 toRoute = Route.CHARGE_UP_ADD,
@@ -102,9 +114,17 @@ class ChargeUpComposeScreen : KoinComponent {
              * 上面tap：年-月 总金额
              * 下面一条条账单
              */
-            ChargeUpCompose(Modifier, chargeUpMap, delClick = viewModel::delById, goDetail = {
-                navController.navigate("${Route.CHARGE_UP_DETAIL.route}/$it")
-            },simpleChargeUpSheet = simpleChargeUpSheet)
+            ChargeUpCompose(
+                Modifier,
+                chargeUpMap,
+                delClick = viewModel::delById,
+                goDetail = {
+                    navController.navigate("${Route.CHARGE_UP_DETAIL.route}/$it")
+                },
+                simpleChargeUpSheet = simpleChargeUpSheet,
+                statisticsList = totalStatisticsList,
+                onChangeStatistics = viewModel::getStatistics
+            )
         }
     }
 }
@@ -117,7 +137,9 @@ fun ChargeUpCompose(
     chargeUpMapList: Map<MonthSumCharge, List<ChargeUpDto>> = hashMapOf(),
     delClick: (Long) -> Unit = {},
     goDetail: (Long) -> Unit = {},
-    simpleChargeUpSheet: SimpleChargeUpSheet = SimpleChargeUpSheet()
+    simpleChargeUpSheet: SimpleChargeUpSheet = SimpleChargeUpSheet(),
+    statisticsList: List<TypeStatistic>,
+    onChangeStatistics: (YearMonth, Boolean) -> Unit
 ) {
     val currentSlippingItem = remember { mutableStateOf<Long?>(null) }
     var showMap by rememberSaveable(chargeUpMapList.size) {
@@ -126,23 +148,30 @@ fun ChargeUpCompose(
         )
     }
 
+    var showDialogStatistics by remember { mutableStateOf(false) }
+
     LazyColumn(modifier.padding(horizontal = 4.dp)) {
         // 添加总消费，和月平均消费信息
         stickyHeader {
             SimpleStatisticsHeaderCompose(
                 totalMoney = simpleChargeUpSheet.totalAmount,
-                monthAverage = simpleChargeUpSheet.averageAmount
+                monthAverage = simpleChargeUpSheet.averageAmount,
+                onClick = {
+                    showDialogStatistics = !showDialogStatistics
+                }
             )
         }
 
         chargeUpMapList.forEach { it ->
 
             stickyHeader {
-                StickyHeaderCompose(Modifier.zIndex(1f).clickable {
-                    showMap = showMap.toMutableMap().apply {
-                        this[it.key.currentDate] = !this[it.key.currentDate]!!
-                    }
-                }, it.key.currentDate, it.key.sumAmount)
+                StickyHeaderCompose(
+                    Modifier.zIndex(1f).clickable {
+                        showMap = showMap.toMutableMap().apply {
+                            this[it.key.currentDate] = !this[it.key.currentDate]!!
+                        }
+                    }, it.key.currentDate, it.key.sumAmount
+                )
             }
 
             items(it.value.size, key = { index -> it.value[index].id!! }) { index ->
@@ -178,24 +207,118 @@ fun ChargeUpCompose(
             }
         }
     }
+
+    if (showDialogStatistics) {
+        StatisticsDialog(
+            onDismiss = { showDialogStatistics = false },
+            statistics = statisticsList,
+            onChangeStatistics = onChangeStatistics
+        )
+    }
 }
 
+@Composable
+fun StatisticsDialog(
+    currentYearMonth: YearMonth = YearMonth.now(),
+    statistics: List<TypeStatistic>,
+    onChangeStatistics: (YearMonth, Boolean) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var selectedYearMonth by remember { mutableStateOf(currentYearMonth) }
+    var showAll by remember { mutableStateOf(false) }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            shape = RoundedCornerShape(24.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+
+                Text(
+                    "统计总览",
+                    style = MaterialTheme.typography.titleLarge
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // 年月选择
+                YearMonthSelector(
+                    selected = selectedYearMonth,
+                    onChange = {
+                        selectedYearMonth = it
+                        onChangeStatistics(it, false)
+                    },
+                    showAll = showAll,
+                    onToggleAll = {
+                        showAll = !showAll
+                        onChangeStatistics(selectedYearMonth, showAll)
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(20.dp).align(Alignment.CenterHorizontally))
+
+                // 圆形统计图
+                // PieChart(statistics)
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // 排序列表
+                StatisticTable(statistics)
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text("关闭")
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun SimpleStatisticsHeaderCompose(
     modifier: Modifier = Modifier,
     totalMoney: String = "0.00",
-    monthAverage: String = "0.00"
+    monthAverage: String = "0.00",
+    onClick: () -> Unit = {}
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth().background(MaterialTheme.colorScheme.onPrimary)
-            .padding(vertical = 16.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = modifier
+            .fillMaxWidth().background(MaterialTheme.colorScheme.onPrimary)
+            .padding(20.dp)
     ) {
-        Text("${stringResource(Res.string.total_consumption)}: $totalMoney")
-        Text("${stringResource(Res.string.month_consumption)}: $monthAverage")
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .padding(vertical = 16.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("${stringResource(Res.string.total_consumption)}: $totalMoney")
+            Text("${stringResource(Res.string.month_consumption)}: $monthAverage")
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        FilledTonalButton(
+            onClick = onClick,
+            shape = RoundedCornerShape(50),
+            modifier = Modifier.align(Alignment.End),
+            colors = ButtonDefaults.filledTonalButtonColors(
+                containerColor = MaterialTheme.colorScheme.onPrimary,
+                contentColor = MaterialTheme.colorScheme.primary
+            )
+        ) {
+            Text("查看总览")
+        }
     }
+
 }
 
 
@@ -263,13 +386,15 @@ fun SlippableChargeUp(
     DraggableItem(state = state, content = {
         ChargeUpItem(modifier.fillMaxHeight().heightIn(max = 100.dp), chargeUpDto, goDetail)
     }, endAction = {
-        DelAction(Modifier.fillMaxHeight().align(Alignment.CenterEnd)
-            .background(MaterialTheme.colorScheme.error).width(defaultActionSize).fillMaxHeight()
-            .heightIn(min = 100.dp).offset {
-                IntOffset(
-                    ((state.requireOffset() + endActionSizePx)).roundToInt(), 0
-                )
-            }.clickable { isShowAlter = !isShowAlter })
+        DelAction(
+            Modifier.fillMaxHeight().align(Alignment.CenterEnd)
+                .background(MaterialTheme.colorScheme.error).width(defaultActionSize)
+                .fillMaxHeight()
+                .heightIn(min = 100.dp).offset {
+                    IntOffset(
+                        ((state.requireOffset() + endActionSizePx)).roundToInt(), 0
+                    )
+                }.clickable { isShowAlter = !isShowAlter })
     })
 
     DeleteConfirmationDialog(showDialog = isShowAlter, onConfirmDelete = {

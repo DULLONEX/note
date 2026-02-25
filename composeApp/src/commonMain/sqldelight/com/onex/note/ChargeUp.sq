@@ -35,7 +35,7 @@ sumAmount:
 SELECT ROUND(sum(amount),2) AS totalAmount FROM ChargeUp WHERE  whetherDelete = 0;
 
 monthAverageAmount:
-SELECT AVG(monthTotal) AS average_amount FROM (
+SELECT ROUND(AVG(monthTotal), 2) AS average_amount FROM (
   SELECT
     CAST(strftime('%Y', fillTime / 1000, 'unixepoch') AS INTEGER) AS year,
     CAST(strftime('%m', fillTime / 1000, 'unixepoch') AS INTEGER) AS month,
@@ -45,3 +45,18 @@ SELECT AVG(monthTotal) AS average_amount FROM (
   GROUP BY
     year,month
 );
+
+
+getAllChargeUpStatisticsGroupType:
+SELECT t2.message AS type,ROUND(sum(t1.amount),2) AS amount FROM ChargeUp AS t1
+INNER JOIN AmountType AS t2 ON t1.amountTypeId = t2.id
+GROUP BY t1.amountTypeId
+ORDER BY ROUND(sum(t1.amount),2);
+
+getAllChargeUpStatisticsGroupTypeBySomeMonth:
+SELECT t2.message AS type,ROUND(sum(t1.amount),2) AS amount FROM ChargeUp AS t1
+INNER JOIN AmountType AS t2 ON t1.amountTypeId = t2.id
+WHERE t1.fillTime >= :startTime
+  AND t1.fillTime < :endTime
+GROUP BY t1.amountTypeId
+ORDER BY ROUND(sum(t1.amount),2);

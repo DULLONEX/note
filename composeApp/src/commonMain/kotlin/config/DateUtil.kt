@@ -10,6 +10,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
@@ -226,3 +227,48 @@ fun LocalDateTime.withHourAndMinute(hour: Int, minute: Int): LocalDateTime {
 }
 
 
+
+
+data class YearMonth(
+    val year: Int,
+    val month: Int
+) {
+
+    fun plusMonths(offset: Int): YearMonth {
+        var total = year * 12 + (month - 1) + offset
+        val newYear = total / 12
+        val newMonth = total % 12 + 1
+        return YearMonth(newYear, newMonth)
+    }
+
+    fun minusMonths(offset: Int) = plusMonths(-offset)
+
+    override fun toString(): String {
+        return "${year}-${month.toString().padStart(2, '0')}"
+    }
+
+    companion object {
+        fun now(): YearMonth {
+            val now = Clock.System.now()
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+
+            return YearMonth(
+                now.year,
+                now.monthNumber
+            )
+        }
+    }
+}
+
+fun monthRange(year: Int, month: Int): Pair<Long, Long> {
+    val start = LocalDate(year, month, 1)
+        .atStartOfDayIn(TimeZone.currentSystemDefault())
+        .toEpochMilliseconds()
+
+    val end = start
+        .let { Instant.fromEpochMilliseconds(it) }
+        .plus(1, DateTimeUnit.MONTH, TimeZone.currentSystemDefault())
+        .toEpochMilliseconds()
+
+    return start to end
+}
